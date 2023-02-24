@@ -1,17 +1,23 @@
 some applications of nvim's treesitter API
 
-## status: just-work
-* too many todo, far from complete
+## status: too many todos, far from complete
 
 ## prerequisites
 * linux
 * nvim 0.8.*
 * haolian9/infra.nvim
 
-## features
+## features & usage
 * generating function doc (lua, go)
+    * move cursor on a `function`, `:lua require'squirrel.docgen.lua'()`
 * foldexpr (lua, python, zig, go, c, json)
+    * `:lua require'squirrel.folding'.attach('lua')`
 * jumping/selecting syntax objects (lua, zig)
+    * `:lua require'squirrel.jumps'.attach('lua')`
+    * more details see `jumps/{lua,zig}/init.lua`
 * quick "import" (python, go)
+    * `:lua require'squirrel.imports'()`
 * incremental selection
+    * `:lua require'squirrel.incsel'()`
 * wrapping codes into block scope (lua, python, zig, c, go, sh)
+    * select text then `:lua require'squirrel.veil'.cover('lua')`
