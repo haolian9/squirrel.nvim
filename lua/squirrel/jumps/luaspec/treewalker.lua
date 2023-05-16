@@ -11,9 +11,7 @@ local function type_checker(...)
   for _, t in ipairs({ ... }) do
     types[t] = true
   end
-  return function(itype)
-    return types[itype] == true
-  end
+  return function(itype) return types[itype] == true end
 end
 
 local is_fn_node = type_checker("function_declaration", "function_definition")

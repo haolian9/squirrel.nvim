@@ -55,9 +55,9 @@ local import_prefixes = {
   python = [[from ]],
 }
 
-return function(win_id)
-  win_id = win_id or api.nvim_get_current_win()
-  local bufnr = api.nvim_win_get_buf(win_id)
+return function(winid)
+  winid = winid or api.nvim_get_current_win()
+  local bufnr = api.nvim_win_get_buf(winid)
 
   ---@type TSNode
   local anchor

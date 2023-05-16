@@ -13,8 +13,8 @@ local nuts = require("squirrel.nuts")
 local nvimkeys = require("infra.nvimkeys")
 local ex = require("infra.ex")
 
-local function find_fn_node_around_cursor(win_id)
-  local start = nuts.get_node_at_cursor(win_id)
+local function find_fn_node_around_cursor(winid)
+  local start = nuts.get_node_at_cursor(winid)
 
   ---@type TSNode?
   local node = start
@@ -80,11 +80,11 @@ local function resolve_return_type(fn_node)
   end
 end
 
-return function(win_id)
-  win_id = win_id or api.nvim_get_current_win()
-  local bufnr = api.nvim_win_get_buf(win_id)
+return function(winid)
+  winid = winid or api.nvim_get_current_win()
+  local bufnr = api.nvim_win_get_buf(winid)
 
-  local fn_node = find_fn_node_around_cursor(win_id)
+  local fn_node = find_fn_node_around_cursor(winid)
   if fn_node == nil then return end
   local params_node = assert(find_params_node(fn_node))
 
@@ -93,7 +93,7 @@ return function(win_id)
     -- todo: respect indent
     for i in fn.range(params_node:named_child_count()) do
       local node = params_node:named_child(i)
-      local text = ts.query.get_node_text(node, bufnr)
+      local text = ts.get_node_text(node, bufnr)
       table.insert(anns, string.format("---@param %s any", text))
     end
     local return_type = resolve_return_type(fn_node)
@@ -106,9 +106,10 @@ return function(win_id)
 
   -- search `any` in generated annotation for easier editing
   do
-    api.nvim_win_set_cursor(win_id, { start_line + 1, 0 })
-    ex("normal", "V")
-    api.nvim_win_set_cursor(win_id, { start_line + 1 + #anns, 0 })
-    api.nvim_feedkeys(nvimkeys([[<esc>/\%V\<\zsany\ze?\=$<cr>]]), "n", false)
+    api.nvim_win_set_cursor(winid, { start_line + 1, 0 })
+    ex("normal! V")
+    api.nvim_win_set_cursor(winid, { start_line + 1 + #anns, 0 })
+    vim.fn.setreg("/", [[\%Vany$]])
+    api.nvim_feedkeys(nvimkeys([[<esc>/<cr>]]), "n", false)
   end
 end

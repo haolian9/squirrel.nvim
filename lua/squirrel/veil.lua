@@ -18,9 +18,7 @@ local blk_pairs = {
 ---@param l0 number 0-based line number
 ---@return string,string,number
 local function resolve_line_indent(bufnr, l0)
-  local ispaces = api.nvim_buf_call(bufnr, function()
-    return vim.fn.indent(l0 + 1)
-  end)
+  local ispaces = api.nvim_buf_call(bufnr, function() return vim.fn.indent(l0 + 1) end)
 
   local bo = vim.bo[bufnr]
   if bo.expandtab then

@@ -2,15 +2,18 @@
 -- * deinit will not clear the visual selection
 -- * since there is only one state, no need to attach it to the WinClose
 
+local M = {}
+
 local api = vim.api
 
 local jelly = require("infra.jellyfish")("squirrel.incsel")
 local nuts = require("squirrel.nuts")
+local startpoints = require("squirrel.incsel.startpoints")
 
 ---@class squirrel.incsel.state
 local state = {
   started = false,
-  win_id = nil,
+  winid = nil,
   bufnr = nil,
   ---@type TSNode[]
   path = nil,
@@ -39,7 +42,7 @@ function state:deinit()
     self:unmap("n", [[<esc>]])
   end)
   self.started = false
-  self.win_id = nil
+  self.winid = nil
   self.bufnr = nil
   self.path = nil
   jelly.info("squirrel.incsel deinited")
@@ -55,7 +58,7 @@ function state:increase()
     -- tip as highest node, not root
     if not nuts.same_range(next, start) and parent ~= nil then
       table.insert(self.path, next)
-      nuts.vsel_node(self.win_id, next)
+      nuts.vsel_node(self.winid, next)
       return
     end
     next = parent
@@ -70,23 +73,24 @@ function state:decrease()
 
   table.remove(self.path, #self.path)
   local next = assert(self.path[#self.path])
-  nuts.vsel_node(self.win_id, next)
+  nuts.vsel_node(self.winid, next)
 end
 
----@param win_id number
-function state:init(win_id)
+---@param winid number
+---@param startpoint_resolver fun(winid: number):TSNode
+function state:init(winid, startpoint_resolver)
   assert(not self.started, "dirty incsel state, hasnt been deinited")
   assert(self.path == nil)
 
-  self.win_id = win_id
-  self.bufnr = api.nvim_win_get_buf(self.win_id)
+  self.winid = winid
+  self.bufnr = api.nvim_win_get_buf(self.winid)
   self.started = true
   self.path = {}
-  table.insert(self.path, nuts.get_node_at_cursor(self.win_id))
+  table.insert(self.path, startpoint_resolver(self.winid))
 
   -- stylua: ignore
   local ok, err = pcall(function()
-    assert(nuts.vsel_node(self.win_id, self.path[1]))
+    assert(nuts.vsel_node(self.winid, self.path[1]))
     self:map("v", "m", function() self:increase() end)
     self:map("v", "n", function() self:decrease() end)
     -- ModeChanged is not reliable, so we hijack the <esc>
@@ -100,17 +104,36 @@ function state:init(win_id)
   end
 end
 
-return function()
-  local win_id = api.nvim_get_current_win()
+function M.n()
+  local pointer = startpoints.n()
+  local winid = api.nvim_get_current_win()
 
   if not state.started then
-    state:init(win_id)
+    state:init(winid, pointer)
     return
   end
 
-  if api.nvim_win_get_buf(win_id) ~= state.bufnr then
+  if api.nvim_win_get_buf(winid) ~= state.bufnr then
     state:deinit()
-    state:init(win_id)
+    state:init(winid, pointer)
     return
   end
 end
+
+function M.m(filetype)
+  local winid = api.nvim_get_current_win()
+  local pointer = startpoints.m(filetype)
+
+  if not state.started then
+    state:init(winid, pointer)
+    return
+  end
+
+  if api.nvim_win_get_buf(winid) ~= state.bufnr then
+    state:deinit()
+    state:init(winid, pointer)
+    return
+  end
+end
+
+return M

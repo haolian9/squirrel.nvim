@@ -27,19 +27,19 @@ do
   end
 
   ---@param finder fun(start: TSNode) TSNode
-  ---@param vseler fun(win_id: number, target: TSNode)
-  ---@return fun(win_id: number?)
+  ---@param vseler fun(winid: number, target: TSNode)
+  ---@return fun(winid: number?)
   local function vsel_object(finder, vseler)
-    ---@param win_id number?
-    return function(win_id)
-      win_id = win_id or api.nvim_get_current_win()
-      local target = finder(nuts.get_node_at_cursor(win_id))
+    ---@param winid number?
+    return function(winid)
+      winid = winid or api.nvim_get_current_win()
+      local target = finder(nuts.get_node_at_cursor(winid))
       if target == nil then
         jelly.info("no object available")
         be_normal()
         return
       end
-      if not vseler(win_id, target) then be_normal() end
+      if not vseler(winid, target) then be_normal() end
     end
   end
 
@@ -65,14 +65,14 @@ end
 
 do
   ---@param finder fun(start: TSNode) TSNode
-  ---@param go_to fun(win_id: number, target: TSNode)
-  ---@return fun(win_id: number?)
+  ---@param go_to fun(winid: number, target: TSNode)
+  ---@return fun(winid: number?)
   local function goto_object(finder, go_to)
-    return function(win_id)
-      win_id = win_id or api.nvim_get_current_win()
-      local target = finder(nuts.get_node_at_cursor(win_id))
+    return function(winid)
+      winid = winid or api.nvim_get_current_win()
+      local target = finder(nuts.get_node_at_cursor(winid))
       if target == nil then return jelly.info("no objects available") end
-      go_to(win_id, target)
+      go_to(winid, target)
     end
   end
 
@@ -87,9 +87,9 @@ do
   M.motions["]s"] = goto_object(treewalker.find_next_sibling_state, nodeops.goto_node_first_identifier)
 end
 
-function M.goto_peer(win_id)
-  win_id = win_id or api.nvim_get_current_win()
-  if not peerouter(win_id) then
+function M.goto_peer(winid)
+  winid = winid or api.nvim_get_current_win()
+  if not peerouter(winid) then
     -- fallback to native %
     ex("normal! %")
   end

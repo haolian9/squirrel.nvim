@@ -4,7 +4,7 @@ local jelly = require("infra.jellyfish")("squirrel.jumps.luaspec")
 local nuts = require("squirrel.nuts")
 
 ---@type squirrel.nuts.goto_node
-function M.goto_node_first_identifier(win_id, node)
+function M.goto_node_first_identifier(winid, node)
   ---@type TSNode?
   local target = node
   while target ~= nil do
@@ -12,13 +12,13 @@ function M.goto_node_first_identifier(win_id, node)
     target = target:named_child(0)
   end
   assert(target ~= nil)
-  nuts.goto_node_beginning(win_id, target)
+  nuts.goto_node_beginning(winid, target)
 end
 
----@param win_id number
+---@param winid number
 ---@param node TSNode
 ---@return boolean
-function M.vsel_node_body(win_id, node)
+function M.vsel_node_body(winid, node)
   local body
   do
     local node_type = node:type()
@@ -39,7 +39,7 @@ function M.vsel_node_body(win_id, node)
       body = bodies[1]
     end
   end
-  return nuts.vsel_node(win_id, body)
+  return nuts.vsel_node(winid, body)
 end
 
 return M

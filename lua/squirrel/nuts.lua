@@ -7,45 +7,45 @@ local ts = vim.treesitter
 local jelly = require("infra.jellyfish")("squirrel.nuts")
 local ex = require("infra.ex")
 
----@param win_id number
+---@param winid number
 ---@return TSNode
-function M.get_node_at_cursor(win_id)
-  local bufnr = api.nvim_win_get_buf(win_id)
-  local cursor = api.nvim_win_get_cursor(win_id)
-  return ts.get_node_at_pos(bufnr, cursor[1] - 1, cursor[2], { ignore_injections = true })
+function M.get_node_at_cursor(winid)
+  local bufnr = api.nvim_win_get_buf(winid)
+  local cursor = api.nvim_win_get_cursor(winid)
+  return ts.get_node({ bufnr = bufnr, pos = { cursor[1] - 1, cursor[2] }, ignore_injections = true })
 end
 
----@alias squirrel.nuts.goto_node fun(win_id: number, node: TSNode)
+---@alias squirrel.nuts.goto_node fun(winid: number, node: TSNode)
 
 ---@type squirrel.nuts.goto_node
-function M.goto_node_beginning(win_id, node)
+function M.goto_node_beginning(winid, node)
   local r0, c0 = node:start()
-  api.nvim_win_set_cursor(win_id, { r0 + 1, c0 })
+  api.nvim_win_set_cursor(winid, { r0 + 1, c0 })
 end
 
 ---@type squirrel.nuts.goto_node
-function M.goto_node_end(win_id, node)
+function M.goto_node_end(winid, node)
   local r1, c1 = node:end_()
-  api.nvim_win_set_cursor(win_id, { r1 + 1, c1 - 1 })
+  api.nvim_win_set_cursor(winid, { r1 + 1, c1 - 1 })
 end
 
 --should only to be used for selecting objects
----@param win_id number
+---@param winid number
 ---@param node TSNode
 ---@return boolean
-function M.vsel_node(win_id, node)
+function M.vsel_node(winid, node)
   local mode = api.nvim_get_mode().mode
   if mode == "no" or mode == "n" then
     -- operator-pending mode
-    M.goto_node_beginning(win_id, node)
+    M.goto_node_beginning(winid, node)
     ex("normal! v")
-    M.goto_node_end(win_id, node)
+    M.goto_node_end(winid, node)
     return true
   elseif mode == "v" then
     -- visual mode
-    M.goto_node_end(win_id, node)
+    M.goto_node_end(winid, node)
     ex("normal! o")
-    M.goto_node_beginning(win_id, node)
+    M.goto_node_beginning(winid, node)
     return true
   else
     jelly.err("unexpected mode for vsel_node: %s", mode)

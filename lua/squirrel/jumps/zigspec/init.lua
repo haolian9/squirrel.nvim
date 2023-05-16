@@ -13,20 +13,20 @@ local M = {
 
 do
   ---@param finder fun(start: TSNode) TSNode
-  ---@param vseler fun(win_id: number, target: TSNode)
-  ---@return fun(win_id: number?)
+  ---@param vseler fun(winid: number, target: TSNode)
+  ---@return fun(winid: number?)
   local function vsel_object(finder, vseler)
-    ---@param win_id number?
-    return function(win_id)
-      win_id = win_id or api.nvim_get_current_win()
-      local target = finder(nuts.get_node_at_cursor(win_id))
+    ---@param winid number?
+    return function(winid)
+      winid = winid or api.nvim_get_current_win()
+      local target = finder(nuts.get_node_at_cursor(winid))
       if target == nil then return jelly.info("no objects available") end
-      vseler(win_id, target)
+      vseler(winid, target)
     end
   end
 
   --parent function
-  M.objects['if'] = vsel_object(treewalker.find_tip_fn, nodeops.vsel_node_body)
+  M.objects["if"] = vsel_object(treewalker.find_tip_fn, nodeops.vsel_node_body)
   M.objects.af = vsel_object(treewalker.find_tip_fn, nodeops.vsel_node)
 
   --function call
@@ -36,14 +36,14 @@ end
 
 do
   ---@param finder fun(start: TSNode) TSNode
-  ---@param gotoer fun(win_id: number, target: TSNode)
-  ---@return fun(win_id: number?)
+  ---@param gotoer fun(winid: number, target: TSNode)
+  ---@return fun(winid: number?)
   local function goto_object(finder, gotoer)
-    return function(win_id)
-      win_id = win_id or api.nvim_get_current_win()
-      local target = finder(nuts.get_node_at_cursor(win_id))
+    return function(winid)
+      winid = winid or api.nvim_get_current_win()
+      local target = finder(nuts.get_node_at_cursor(winid))
       if target == nil then return jelly.info("no objects available") end
-      gotoer(win_id, target)
+      gotoer(winid, target)
     end
   end
 

@@ -1,9 +1,9 @@
 local M = {}
 
----@param win_id number
+---@param winid number
 ---@param node TSNode
-function M.vsel_node_body(win_id, node)
-  local _, _ = win_id, node
+function M.vsel_node_body(winid, node)
+  local _, _ = winid, node
   error("not implemented")
 end
 

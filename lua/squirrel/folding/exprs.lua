@@ -36,7 +36,6 @@ local function expr_handler(ft)
     local bufnr = api.nvim_get_current_buf()
     local line_level = state:get(bufnr)
     if line_level == nil then
-      -- todo: mutex?
       line_level = resolver(bufnr)
       local tick = api.nvim_buf_get_changedtick(bufnr)
       state:set(bufnr, tick, line_level)

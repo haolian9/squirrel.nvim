@@ -3,8 +3,8 @@ local exprs = require("squirrel.folding.exprs")
 local ex = require("infra.ex")
 
 return function()
-  local win_id = api.nvim_get_current_win()
-  local bufnr = api.nvim_win_get_buf(win_id)
+  local winid = api.nvim_get_current_win()
+  local bufnr = api.nvim_win_get_buf(winid)
 
   local new_bufnr
   do
@@ -36,7 +36,7 @@ return function()
   end
 
   -- scrollbind
-  api.nvim_win_set_cursor(new_win_id, api.nvim_win_get_cursor(win_id))
-  api.nvim_win_set_option(win_id, "scrollbind", true)
+  api.nvim_win_set_cursor(new_win_id, api.nvim_win_get_cursor(winid))
+  api.nvim_win_set_option(winid, "scrollbind", true)
   api.nvim_win_set_option(new_win_id, "scrollbind", true)
 end
