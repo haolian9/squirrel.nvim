@@ -3,6 +3,7 @@ local M = {}
 local api = vim.api
 local vsel = require("infra.vsel")
 local jelly = require("infra.jellyfish")("squirrel.veil", vim.log.levels.INFO)
+local prefer = require("infra.prefer")
 
 ---@type {[string]: string[]}
 local blk_pairs = {
@@ -20,7 +21,7 @@ local blk_pairs = {
 local function resolve_line_indent(bufnr, l0)
   local ispaces = api.nvim_buf_call(bufnr, function() return vim.fn.indent(l0 + 1) end)
 
-  local bo = vim.bo[bufnr]
+  local bo = prefer.buf(bufnr)
   if bo.expandtab then
     local sw = bo.shiftwidth
     return string.rep(" ", ispaces), " ", sw
@@ -32,19 +33,18 @@ end
 
 function M.cover(ft, bufnr)
   bufnr = bufnr or api.nvim_get_current_buf()
-  ft = ft or api.nvim_buf_get_option(bufnr, "filetype")
+  ft = ft or prefer.bo(bufnr, "filetype")
 
   local pair = blk_pairs[ft]
   if pair == nil then return jelly.warn("not supported filetype for squirrel.veil") end
 
-  local r0, _, r1, _ = vsel.range(bufnr)
-  jelly.debug("r0=%d, r1=%d", r0, r1)
-  if r0 == 0 and r1 == 0 then return jelly.info("no selection") end
+  local range = vsel.range(bufnr)
+  if range == nil then return jelly.info("no selection") end
 
   local lines
   do
-    local indents, ichar, iunit = resolve_line_indent(bufnr, r0 - 1)
-    lines = api.nvim_buf_get_lines(bufnr, r0 - 1, r1, false)
+    local indents, ichar, iunit = resolve_line_indent(bufnr, range.start_line)
+    lines = api.nvim_buf_get_lines(bufnr, range.start_line, range.stop_line, false)
     do
       local add = string.rep(ichar, iunit)
       for i = 1, #lines do
@@ -58,7 +58,7 @@ function M.cover(ft, bufnr)
     end
   end
 
-  api.nvim_buf_set_lines(bufnr, r0 - 1, r1, false, lines)
+  api.nvim_buf_set_lines(bufnr, range.start_line, range.stop_line, false, lines)
 end
 
 function M.uncover(ft, bufnr)

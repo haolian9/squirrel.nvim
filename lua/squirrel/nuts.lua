@@ -6,6 +6,7 @@ local api = vim.api
 local ts = vim.treesitter
 local jelly = require("infra.jellyfish")("squirrel.nuts")
 local ex = require("infra.ex")
+local jumplist = require("infra.jumplist")
 
 ---@param winid number
 ---@return TSNode
@@ -19,12 +20,16 @@ end
 
 ---@type squirrel.nuts.goto_node
 function M.goto_node_beginning(winid, node)
+  jumplist.push_here()
+
   local r0, c0 = node:start()
   api.nvim_win_set_cursor(winid, { r0 + 1, c0 })
 end
 
 ---@type squirrel.nuts.goto_node
 function M.goto_node_end(winid, node)
+  jumplist.push_here()
+
   local r1, c1 = node:end_()
   api.nvim_win_set_cursor(winid, { r1 + 1, c1 - 1 })
 end

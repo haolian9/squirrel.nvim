@@ -9,6 +9,8 @@ local jelly = require("infra.jellyfish")("squirrel.docgen.go")
 local nuts = require("squirrel.nuts")
 local ex = require("infra.ex")
 local nvimkeys = require("infra.nvimkeys")
+local prefer = require("infra.prefer")
+local jumplist = require("infra.jumplist")
 
 ---@param start TSNode
 ---@return TSNode?
@@ -23,7 +25,7 @@ end
 
 local function resolve_line_indent(bufnr, l0)
   local ispcs = api.nvim_buf_call(bufnr, function() return vim.fn.indent(l0 + 1) end)
-  local sw = api.nvim_buf_get_option(bufnr, "shiftwidth")
+  local sw = prefer.bo(bufnr, "shiftwidth")
   return string.rep("\t", ispcs / sw)
 end
 
@@ -46,6 +48,8 @@ local function try_field_ann(start, winid, bufnr)
     local indents = resolve_line_indent(bufnr, r0)
     ann = string.format("%s// %s desc", indents, field_name)
   end
+
+  jumplist.push_here()
 
   api.nvim_buf_set_lines(bufnr, r0, r0, false, { ann })
 

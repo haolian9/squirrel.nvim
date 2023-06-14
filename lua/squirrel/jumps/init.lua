@@ -1,5 +1,8 @@
 local M = {}
 
+local bufmap = require("infra.keymap.buffer")
+local prefer = require("infra.prefer")
+
 local api = vim.api
 
 function M.attach(ft)
@@ -8,7 +11,7 @@ function M.attach(ft)
 
   local spec
   do
-    ft = ft or api.nvim_buf_get_option(bufnr, "filetype")
+    ft = ft or prefer.bo(bufnr, "filetype")
     if ft == "lua" then
       spec = require("squirrel.jumps.luaspec")
     elseif ft == "zig" then
@@ -18,16 +21,18 @@ function M.attach(ft)
     end
   end
 
+  local bm = bufmap.wraps(bufnr)
+
   for lhs, rhs in pairs(spec.objects) do
-    api.nvim_buf_set_keymap(bufnr, "x", lhs, "", { noremap = true, callback = rhs })
-    api.nvim_buf_set_keymap(bufnr, "o", lhs, "", { noremap = true, callback = rhs })
+    bm.x(lhs, rhs)
+    bm.o(lhs, rhs)
   end
 
   for lhs, rhs in pairs(spec.motions) do
-    api.nvim_buf_set_keymap(bufnr, "n", lhs, "", { noremap = true, callback = rhs })
+    bm.n(lhs, rhs)
   end
 
-  if spec.goto_peer ~= nil then api.nvim_buf_set_keymap(bufnr, "n", "%", "", { noremap = true, callback = spec.goto_peer }) end
+  if spec.goto_peer ~= nil then bm.n("%", spec.goto_peer) end
 end
 
 return M

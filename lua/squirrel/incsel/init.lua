@@ -7,6 +7,7 @@ local M = {}
 local api = vim.api
 
 local jelly = require("infra.jellyfish")("squirrel.incsel")
+local bufmap = require("infra.keymap.buffer")
 local nuts = require("squirrel.nuts")
 local startpoints = require("squirrel.incsel.startpoints")
 
@@ -18,15 +19,6 @@ local state = {
   ---@type TSNode[]
   path = nil,
 }
-
-function state:map(mode, lhs, rhs)
-  assert(self.started)
-  api.nvim_buf_set_keymap(self.bufnr, mode, lhs, "", {
-    silent = true,
-    noremap = true,
-    callback = rhs,
-  })
-end
 
 function state:unmap(mode, lhs)
   assert(self.started)
@@ -91,11 +83,12 @@ function state:init(winid, startpoint_resolver)
   -- stylua: ignore
   local ok, err = pcall(function()
     assert(nuts.vsel_node(self.winid, self.path[1]))
-    self:map("v", "m", function() self:increase() end)
-    self:map("v", "n", function() self:decrease() end)
+    local bm = bufmap.wraps(self.bufnr)
+    bm.v("m", function() self:increase() end)
+    bm.v("n", function() self:decrease() end)
     -- ModeChanged is not reliable, so we hijack the <esc>
-    self:map("v", [[<esc>]], function() self:deinit() end)
-    self:map("n", [[<esc>]], function() self:deinit() end)
+    bm.v([[<esc>]], function() self:deinit() end)
+    bm.n([[<esc>]], function() self:deinit() end)
   end)
 
   if not ok then

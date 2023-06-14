@@ -12,6 +12,7 @@ local fn = require("infra.fn")
 local nuts = require("squirrel.nuts")
 local nvimkeys = require("infra.nvimkeys")
 local ex = require("infra.ex")
+local jumplist = require("infra.jumplist")
 
 local function find_fn_node_around_cursor(winid)
   local start = nuts.get_node_at_cursor(winid)
@@ -101,11 +102,14 @@ return function(winid)
     if #anns == 0 then return end
   end
 
+  jumplist.push_here()
+
   local start_line = fn_node:range()
   api.nvim_buf_set_lines(bufnr, start_line, start_line, false, anns)
 
   -- search `any` in generated annotation for easier editing
   do
+    -- todo: move to infra.vsel
     api.nvim_win_set_cursor(winid, { start_line + 1, 0 })
     ex("normal! V")
     api.nvim_win_set_cursor(winid, { start_line + 1 + #anns, 0 })

@@ -1,5 +1,7 @@
 local M = {}
 
+local prefer = require("infra.prefer")
+
 local api = vim.api
 
 function M.attach(ft)
@@ -7,10 +9,10 @@ function M.attach(ft)
 
   if ft == nil then
     local bufnr = api.nvim_win_get_buf(winid)
-    ft = api.nvim_buf_get_option(bufnr, "filetype")
+    ft = prefer.bo(bufnr, "filetype")
   end
 
-  local wo = vim.wo[winid]
+  local wo = prefer.win(winid)
   wo.foldmethod = "expr"
   wo.foldlevel = 1
   wo.foldexpr = string.format([[v:lua.require'squirrel.folding.exprs'.%s(v:lnum)]], ft)

@@ -5,7 +5,7 @@ local fn = require("infra.fn")
 ---@alias Resolver fun(start_node: TSNode): TSNode
 
 local passthrough = (function()
-  local types = fn.set({ "comment" })
+  local types = fn.toset({ "comment" })
   local function inner(node) return node end
 
   ---@param ntype string
@@ -16,7 +16,7 @@ local passthrough = (function()
 end)()
 
 local seek_upward = (function()
-  local stops = fn.set({
+  local stops = fn.toset({
     "function_call",
     "table_constructor",
     "block",
