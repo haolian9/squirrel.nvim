@@ -19,15 +19,15 @@ local blk_pairs = {
 ---@param l0 number 0-based line number
 ---@return string,string,number
 local function resolve_line_indent(bufnr, l0)
-  local ispaces = api.nvim_buf_call(bufnr, function() return vim.fn.indent(l0 + 1) end)
+  local nsp = api.nvim_buf_call(bufnr, function() return vim.fn.indent(l0 + 1) end)
 
   local bo = prefer.buf(bufnr)
   if bo.expandtab then
-    local sw = bo.shiftwidth
-    return string.rep(" ", ispaces), " ", sw
+    local ts = bo.tabstop
+    return string.rep(" ", nsp), " ", ts
   else
-    local sw = bo.shiftwidth
-    return string.rep("\t", ispaces / sw), "\t", 1
+    local ts = bo.tabstop
+    return string.rep("\t", nsp / ts), "\t", 1
   end
 end
 
