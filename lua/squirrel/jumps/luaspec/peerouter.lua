@@ -1,15 +1,9 @@
---[[
-
-design choices
-* start node must be a if/else/elseif/while/for
-* it's pointless to move to the then, do node
-
-uncovered cases:
-* expr: x and y or z
-
-todo: backward
-
---]]
+--design choices
+--* start node must be a if/else/elseif/while/for
+--* it's pointless to move to the then, do node
+--
+--uncovered cases:
+--* expr: x and y or z
 
 ---@alias squirrel.jumps.goto_peer fun(winid: number, node: TSNode, itype: string)
 

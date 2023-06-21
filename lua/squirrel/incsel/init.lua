@@ -28,9 +28,9 @@ end
 function state:deinit()
   assert(self.started)
   local ok, err = pcall(function()
-    self:unmap("v", "m")
-    self:unmap("v", "n")
-    self:unmap("v", [[<esc>]])
+    self:unmap("x", "m")
+    self:unmap("x", "n")
+    self:unmap("x", [[<esc>]])
     self:unmap("n", [[<esc>]])
   end)
   self.started = false
@@ -84,11 +84,11 @@ function state:init(winid, startpoint_resolver)
   local ok, err = pcall(function()
     assert(nuts.vsel_node(self.winid, self.path[1]))
     local bm = bufmap.wraps(self.bufnr)
-    bm.v("m", function() self:increase() end)
-    bm.v("n", function() self:decrease() end)
+    bm.x("m", function() self:increase() end)
+    bm.x("n", function() self:decrease() end)
     -- ModeChanged is not reliable, so we hijack the <esc>
-    bm.v([[<esc>]], function() self:deinit() end)
-    bm.n([[<esc>]], function() self:deinit() end)
+    bm.x('<esc>', function() self:deinit() end)
+    bm.n('<esc>', function() self:deinit() end)
   end)
 
   if not ok then

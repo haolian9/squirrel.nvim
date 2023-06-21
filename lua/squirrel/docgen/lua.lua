@@ -5,14 +5,16 @@
 -- * annotations of function signature
 --
 
-local ts = vim.treesitter
-local api = vim.api
 local jelly = require("infra.jellyfish")("squirrel.docgen", vim.log.levels.INFO)
 local fn = require("infra.fn")
 local nuts = require("squirrel.nuts")
 local nvimkeys = require("infra.nvimkeys")
 local ex = require("infra.ex")
 local jumplist = require("infra.jumplist")
+local vsel = require("infra.vsel")
+
+local ts = vim.treesitter
+local api = vim.api
 
 local function find_fn_node_around_cursor(winid)
   local start = nuts.get_node_at_cursor(winid)
@@ -81,8 +83,8 @@ local function resolve_return_type(fn_node)
   end
 end
 
-return function(winid)
-  winid = winid or api.nvim_get_current_win()
+return function()
+  local winid = api.nvim_get_current_win()
   local bufnr = api.nvim_win_get_buf(winid)
 
   local fn_node = find_fn_node_around_cursor(winid)
@@ -110,9 +112,7 @@ return function(winid)
   -- search `any` in generated annotation for easier editing
   do
     -- todo: move to infra.vsel
-    api.nvim_win_set_cursor(winid, { start_line + 1, 0 })
-    ex("normal! V")
-    api.nvim_win_set_cursor(winid, { start_line + 1 + #anns, 0 })
+    vsel.select_lines(start_line, start_line + #anns + 1)
     vim.fn.setreg("/", [[\%Vany$]])
     api.nvim_feedkeys(nvimkeys([[<esc>/<cr>]]), "n", false)
   end

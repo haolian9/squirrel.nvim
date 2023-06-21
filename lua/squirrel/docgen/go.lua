@@ -56,16 +56,15 @@ local function try_field_ann(start, winid, bufnr)
   -- search `desc` in generated annotation for easier editing
   do
     api.nvim_win_set_cursor(winid, { r0 + 1, 0 })
-    ex("normal", "V")
-    api.nvim_feedkeys(nvimkeys([[<esc>/\%V\<\zsdesc$<cr>]]), "n", false)
+    api.nvim_feedkeys(nvimkeys([[V<esc>/\%V\<\zsdesc$<cr>]]), "n", false)
   end
 end
 
 ---@type fun(start: TSNode, winid: number, bufnr: number): true?[]
 local tries = { try_field_ann }
 
-return function(winid)
-  winid = winid or api.nvim_get_current_win()
+return function()
+  local winid = api.nvim_get_current_win()
   local bufnr = api.nvim_win_get_buf(winid)
   local start = nuts.get_node_at_cursor(winid)
 

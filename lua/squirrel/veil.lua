@@ -14,7 +14,6 @@ local blk_pairs = {
   sh = { "{", "}" },
 }
 
---todo: exact as an api in infra.?
 ---@param bufnr number
 ---@param l0 number 0-based line number
 ---@return string,string,number
