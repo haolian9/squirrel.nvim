@@ -1,7 +1,7 @@
 local ts = vim.treesitter
 local api = vim.api
 local nuts = require("squirrel.nuts")
-local jelly = require("infra.jellyfish")("squirrel.imports", vim.log.levels.INFO)
+local jelly = require("infra.jellyfish")("squirrel.imports.insert")
 local nvimkeys = require("infra.nvimkeys")
 local ex = require("infra.ex")
 

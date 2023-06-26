@@ -9,7 +9,6 @@ local jelly = require("infra.jellyfish")("squirrel.docgen", vim.log.levels.INFO)
 local fn = require("infra.fn")
 local nuts = require("squirrel.nuts")
 local nvimkeys = require("infra.nvimkeys")
-local ex = require("infra.ex")
 local jumplist = require("infra.jumplist")
 local vsel = require("infra.vsel")
 
