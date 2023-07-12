@@ -2,18 +2,31 @@
 
 local M = {}
 
+local ex = require("infra.ex")
+local jelly = require("infra.jellyfish")("squirrel.nuts", "debug")
+local jumplist = require("infra.jumplist")
+local unsafe = require("infra.unsafe")
+
 local api = vim.api
 local ts = vim.treesitter
-local jelly = require("infra.jellyfish")("squirrel.nuts")
-local ex = require("infra.ex")
-local jumplist = require("infra.jumplist")
 
+---NB: when the cursor lays at the end of line, it will advance one char
 ---@param winid number
 ---@return TSNode
 function M.get_node_at_cursor(winid)
   local bufnr = api.nvim_win_get_buf(winid)
-  local cursor = api.nvim_win_get_cursor(winid)
-  return ts.get_node({ bufnr = bufnr, pos = { cursor[1] - 1, cursor[2] }, ignore_injections = true })
+
+  local lnum, col
+  do
+    lnum, col = unpack(api.nvim_win_get_cursor(winid))
+    lnum = lnum - 1
+    --todo: maybe advance to the last non-blank char
+    local llen = assert(unsafe.linelen(bufnr, lnum))
+    assert(col <= llen, "unreachable: col can not gte llen")
+    if col > 0 and col == llen then col = col - 1 end
+  end
+
+  return ts.get_node({ bufnr = bufnr, pos = { lnum, col }, ignore_injections = true })
 end
 
 ---@alias squirrel.nuts.goto_node fun(winid: number, node: TSNode)
@@ -67,6 +80,87 @@ function M.same_range(a, b)
   local a_r0, a_c0, a_r1, a_c1 = a:range()
   local b_r0, b_c0, b_r1, b_c1 = b:range()
   return a_r0 == b_r0 and a_c0 == b_c0 and a_r1 == b_r1 and a_c1 == b_c1
+end
+
+---@param bufnr integer
+---@param node TSNode
+---@return string[]
+function M.get_node_lines(bufnr, node)
+  local start_line, start_col, stop_line, stop_col = node:range()
+
+  --stolen from vim.treesitter.get_node_text for edge cases
+  if stop_col == 0 then
+    if start_line == stop_line then
+      start_col = -1
+      start_line = start_line - 1
+    end
+    stop_col = -1
+    stop_line = stop_line - 1
+  end
+
+  return api.nvim_buf_get_text(bufnr, start_line, start_col, stop_line, stop_col, {})
+end
+
+---get the first char from the first line of a node
+---@param bufnr integer
+---@param node TSNode
+---@return string
+function M.get_node_first_char(bufnr, node)
+  local start_line, start_col = node:range()
+  local text = api.nvim_buf_get_text(bufnr, start_line, start_col, start_line, start_col + 1, {})
+  assert(#text == 1)
+  local char = text[1]
+  assert(#char == 1)
+  return char
+end
+
+---get the last char from the last line of a node
+---@param bufnr integer
+---@param node TSNode
+---@return string
+function M.get_node_last_char(bufnr, node)
+  local _, _, stop_line, stop_col = node:range()
+  local text = api.nvim_buf_get_text(bufnr, stop_line, stop_col - 1, stop_line, stop_col, {})
+  assert(#text == 1)
+  local char = text[1]
+  assert(#char == 1)
+  return char
+end
+
+---get <=n chars from the first line of a node
+---@param bufnr integer
+---@param node TSNode
+---@param n integer
+---@return string
+function M.get_node_start_chars(bufnr, node, n)
+  local start_line, start_col, stop_line, stop_col = node:range()
+  local corrected_stop_col
+  if start_line == stop_line then
+    corrected_stop_col = math.min(start_col + n, stop_col)
+  else
+    corrected_stop_col = start_col + n
+  end
+  local text = api.nvim_buf_get_text(bufnr, start_line, start_col, start_line, corrected_stop_col, {})
+  assert(#text == 1)
+  return text[1]
+end
+
+---get <=n chars from the last line of a node
+---@param bufnr integer
+---@param node TSNode
+---@param n integer
+---@return string
+function M.get_node_end_chars(bufnr, node, n)
+  local start_line, start_col, stop_line, stop_col = node:range()
+  local corrected_start_col
+  if start_line == stop_line then
+    corrected_start_col = math.max(stop_col - n, start_col)
+  else
+    corrected_start_col = math.max(stop_col - n, 0)
+  end
+  local text = api.nvim_buf_get_text(bufnr, stop_line, corrected_start_col, stop_line, stop_col, {})
+  assert(#text == 1)
+  return text[1]
 end
 
 return M

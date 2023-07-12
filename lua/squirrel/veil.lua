@@ -1,9 +1,9 @@
 local M = {}
 
 local api = vim.api
-local vsel = require("infra.vsel")
-local jelly = require("infra.jellyfish")("squirrel.veil", vim.log.levels.INFO)
+local jelly = require("infra.jellyfish")("squirrel.veil", "info")
 local prefer = require("infra.prefer")
+local vsel = require("infra.vsel")
 
 ---@type {[string]: string[]}
 local blk_pairs = {

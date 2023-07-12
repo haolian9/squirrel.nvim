@@ -1,7 +1,7 @@
 ---design choices
 ---* when cursor is placed outside of string, `|""` or `""|`, triggers not
 
-local jelly = require("infra.jellyfish")("squirrel.fstr", vim.log.levels.DEBUG)
+local jelly = require("infra.jellyfish")("squirrel.fstr", "debug")
 local prefer = require("infra.prefer")
 
 local nuts = require("squirrel.nuts")

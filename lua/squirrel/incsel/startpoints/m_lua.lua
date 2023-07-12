@@ -1,19 +1,21 @@
-local nuts = require("squirrel.nuts")
-local jelly = require("infra.jellyfish")("squirrel.incsel.startpoints.m_lua", vim.log.levels.DEBUG)
 local fn = require("infra.fn")
+local jelly = require("infra.jellyfish")("squirrel.incsel.startpoints.m_lua", "debug")
+
+local nuts = require("squirrel.nuts")
 
 ---@alias Resolver fun(start_node: TSNode): TSNode
 
-local passthrough = (function()
+local passthrough
+do
   local types = fn.toset({ "comment" })
   local function inner(node) return node end
 
   ---@param ntype string
   ---@return Resolver?
-  return function(ntype)
+  function passthrough(ntype)
     if types[ntype] then return inner end
   end
-end)()
+end
 
 local seek_upward = (function()
   local stops = fn.toset({

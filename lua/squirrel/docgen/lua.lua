@@ -5,12 +5,13 @@
 -- * annotations of function signature
 --
 
-local jelly = require("infra.jellyfish")("squirrel.docgen", vim.log.levels.INFO)
 local fn = require("infra.fn")
-local nuts = require("squirrel.nuts")
-local nvimkeys = require("infra.nvimkeys")
+local jelly = require("infra.jellyfish")("squirrel.docgen", "INFO")
 local jumplist = require("infra.jumplist")
+local nvimkeys = require("infra.nvimkeys")
 local vsel = require("infra.vsel")
+
+local nuts = require("squirrel.nuts")
 
 local ts = vim.treesitter
 local api = vim.api

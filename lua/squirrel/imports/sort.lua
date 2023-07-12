@@ -19,7 +19,7 @@
 ---
 
 local fn = require("infra.fn")
-local jelly = require("infra.jellyfish")("squirrel.imports.sort", vim.log.levels.INFO)
+local jelly = require("infra.jellyfish")("squirrel.imports.sort", "info")
 local prefer = require("infra.prefer")
 local Regulator = require("infra.Regulator")
 local strlib = require("infra.strlib")

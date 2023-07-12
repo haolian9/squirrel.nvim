@@ -1,15 +1,17 @@
-local api = vim.api
-local nuts = require("squirrel.nuts")
-local treewalker = require("squirrel.jumps.zigspec.treewalker")
-local nodeops = require("squirrel.jumps.zigspec.nodeops")
+local M = {}
+
 local jelly = require("infra.jellyfish")("squirrel.jumps.zigspec")
 
-local M = {
-  objects = {},
-  motions = {},
-  -- not available, treesitter-zig generates nonsense ast
-  goto_peer = nil,
-}
+local nodeops = require("squirrel.jumps.zigspec.nodeops")
+local treewalker = require("squirrel.jumps.zigspec.treewalker")
+local nuts = require("squirrel.nuts")
+
+local api = vim.api
+
+M.objects = {}
+M.motions = {}
+-- not available, treesitter-zig generates nonsense ast
+M.goto_peer = nil
 
 do
   ---@param finder fun(start: TSNode) TSNode

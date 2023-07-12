@@ -1,17 +1,19 @@
-local api = vim.api
-local treewalker = require("squirrel.jumps.luaspec.treewalker")
-local nodeops = require("squirrel.jumps.luaspec.nodeops")
-local jelly = require("infra.jellyfish")("squirrel.jumps.luaspec")
-local peerouter = require("squirrel.jumps.luaspec.peerouter")
-local nuts = require("squirrel.nuts")
+local M = {}
+
 local ex = require("infra.ex")
+local jelly = require("infra.jellyfish")("squirrel.jumps.luaspec")
 local nvimkeys = require("infra.nvimkeys")
 
-local M = {
-  objects = {},
-  motions = {},
-  goto_peer = nil,
-}
+local nodeops = require("squirrel.jumps.luaspec.nodeops")
+local peerouter = require("squirrel.jumps.luaspec.peerouter")
+local treewalker = require("squirrel.jumps.luaspec.treewalker")
+local nuts = require("squirrel.nuts")
+
+local api = vim.api
+
+M.objects = {}
+M.motions = {}
+M.goto_peer = nil
 
 do
   -- expected use in operator-pending, visual mode only
