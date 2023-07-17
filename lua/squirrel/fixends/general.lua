@@ -1,12 +1,3 @@
---supported cases
---* --inline pairs
---* [x] '
---* [x] "
---* [x] (
---* [x] [
---* [x] {
---* [x] [[
-
 local jelly = require("infra.jellyfish")("fixend.general")
 local resolve_line_indents = require("infra.resolve_line_indents")
 
@@ -15,7 +6,8 @@ local api = vim.api
 local try_inline_pair, try_multiline_pair
 do
   local inline_pairs = {
-    { 1, { ['"'] = '"', ["'"] = "'", ["("] = ")", ["{"] = "}", ["["] = "]", ["`"] = "`" } },
+    --i prefer `''<c-o>i` muscle memory
+    -- { 1, { ['"'] = '"', ["'"] = "'", ["("] = ")", ["{"] = "}", ["["] = "]", ["`"] = "`" } },
     { 2, { ["[["] = "]]" } },
     { 3, { ["'''"] = "'''", ['"""'] = '"""', ["```"] = "```" } },
   }
