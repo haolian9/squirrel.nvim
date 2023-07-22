@@ -6,7 +6,7 @@ local M = {}
 
 local api = vim.api
 
-local jelly = require("infra.jellyfish")("squirrel.incsel", "debug")
+local jelly = require("infra.jellyfish")("squirrel.incsel")
 local bufmap = require("infra.keymap.buffer")
 
 local startpoints = require("squirrel.incsel.startpoints")

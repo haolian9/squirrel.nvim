@@ -1,7 +1,7 @@
 ---design choices
 ---* when cursor is placed outside of string, `|""` or `""|`, triggers not
 
-local jelly = require("infra.jellyfish")("squirrel.fstr", "debug")
+local jelly = require("infra.jellyfish")("squirrel.fstr")
 local prefer = require("infra.prefer")
 
 local nuts = require("squirrel.nuts")

@@ -5,7 +5,7 @@
 local M = {}
 
 local ex = require("infra.ex")
-local jelly = require("infra.jellyfish")("squirrel.nuts", "debug")
+local jelly = require("infra.jellyfish")("squirrel.nuts")
 local jumplist = require("infra.jumplist")
 local unsafe = require("infra.unsafe")
 

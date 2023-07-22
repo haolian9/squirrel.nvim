@@ -1,5 +1,4 @@
 local fn = require("infra.fn")
-local jelly = require("infra.jellyfish")("squirrel.incsel.startpoints.m_lua", "debug")
 
 local nuts = require("squirrel.nuts")
 
