@@ -108,7 +108,7 @@ do
   ---@param node TSNode
   ---@return string
   function M.get_node_first_char(bufnr, node)
-    local start_line, start_col = node:range()
+    local start_line, start_col = node:start()
     local text = api.nvim_buf_get_text(bufnr, start_line, start_col, start_line, start_col + 1, {})
     assert(#text == 1)
     local char = text[1]
@@ -121,7 +121,7 @@ do
   ---@param node TSNode
   ---@return string
   function M.get_node_last_char(bufnr, node)
-    local _, _, stop_line, stop_col = node:range()
+    local stop_line, stop_col = node:end_()
     local text = api.nvim_buf_get_text(bufnr, stop_line, stop_col - 1, stop_line, stop_col, {})
     assert(#text == 1)
     local char = text[1]
