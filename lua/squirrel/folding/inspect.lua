@@ -1,6 +1,7 @@
-local exprs = require("squirrel.folding.exprs")
 local ex = require("infra.ex")
 local prefer = require("infra.prefer")
+
+local exprs = require("squirrel.folding.exprs")
 
 local api = vim.api
 

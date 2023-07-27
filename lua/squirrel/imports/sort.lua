@@ -19,7 +19,7 @@
 ---
 
 local fn = require("infra.fn")
-local jelly = require("infra.jellyfish")("squirrel.imports.sort", "info")
+local jelly = require("infra.jellyfish")("squirrel.imports.sort")
 local prefer = require("infra.prefer")
 local Regulator = require("infra.Regulator")
 local strlib = require("infra.strlib")
@@ -101,13 +101,12 @@ local function find_require_mod_name(bufnr, root)
   return name
 end
 
----@type fun(orig_requires: Require[]): Require[][]
 local sorted_tiers
 do
   local preset_tiers = {
     fn.toset({ "ffi" }),
     fn.toset({ "vim" }),
-    fn.toset({ "infra" }),
+    fn.toset({ "infra", "cthulhu" }),
   }
 
   ---@param a Require
@@ -115,6 +114,8 @@ do
   ---@return boolean
   local function compare_requires(a, b) return string.lower(a.name) < string.lower(b.name) end
 
+  ---@param orig_requires Require[]
+  ---@return Require[][]
   function sorted_tiers(orig_requires)
     local tiers = {}
     do

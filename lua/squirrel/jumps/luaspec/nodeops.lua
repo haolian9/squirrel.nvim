@@ -1,6 +1,7 @@
 local M = {}
 
 local jelly = require("infra.jellyfish")("squirrel.jumps.luaspec")
+
 local nuts = require("squirrel.nuts")
 
 ---@type squirrel.nuts.goto_node

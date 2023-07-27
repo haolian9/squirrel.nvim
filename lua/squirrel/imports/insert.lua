@@ -1,9 +1,10 @@
 local ts = vim.treesitter
 local api = vim.api
-local nuts = require("squirrel.nuts")
+local ex = require("infra.ex")
 local jelly = require("infra.jellyfish")("squirrel.imports.insert")
 local nvimkeys = require("infra.nvimkeys")
-local ex = require("infra.ex")
+
+local nuts = require("squirrel.nuts")
 
 ---@type { [string]: fun(root: TSNode): TSNode? }
 local last_import_finders = {}

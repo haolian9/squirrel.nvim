@@ -6,10 +6,11 @@
 local ts = vim.treesitter
 local api = vim.api
 local jelly = require("infra.jellyfish")("squirrel.docgen.go")
-local nuts = require("squirrel.nuts")
+local jumplist = require("infra.jumplist")
 local nvimkeys = require("infra.nvimkeys")
 local prefer = require("infra.prefer")
-local jumplist = require("infra.jumplist")
+
+local nuts = require("squirrel.nuts")
 
 ---@param start TSNode
 ---@return TSNode?
