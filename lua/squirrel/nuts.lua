@@ -5,6 +5,7 @@
 local M = {}
 
 local ex = require("infra.ex")
+local fn = require("infra.fn")
 local jelly = require("infra.jellyfish")("squirrel.nuts")
 local jumplist = require("infra.jumplist")
 local unsafe = require("infra.unsafe")
@@ -33,19 +34,19 @@ end
 ---@alias squirrel.nuts.goto_node fun(winid: number, node: TSNode)
 
 ---@type squirrel.nuts.goto_node
-function M.goto_node_beginning(winid, node)
+function M.goto_node_head(winid, node)
   jumplist.push_here()
 
-  local r0, c0 = node:start()
-  api.nvim_win_set_cursor(winid, { r0 + 1, c0 })
+  local lnum, col = node:start()
+  api.nvim_win_set_cursor(winid, { lnum + 1, col })
 end
 
 ---@type squirrel.nuts.goto_node
-function M.goto_node_end(winid, node)
+function M.goto_node_tail(winid, node)
   jumplist.push_here()
 
-  local r1, c1 = node:end_()
-  api.nvim_win_set_cursor(winid, { r1 + 1, c1 - 1 })
+  local lnum, col = node:end_()
+  api.nvim_win_set_cursor(winid, { lnum + 1, col - 1 })
 end
 
 --should only to be used for selecting objects
@@ -56,15 +57,15 @@ function M.vsel_node(winid, node)
   local mode = api.nvim_get_mode().mode
   if mode == "no" or mode == "n" then
     -- operator-pending mode
-    M.goto_node_beginning(winid, node)
+    M.goto_node_head(winid, node)
     ex("normal! v")
-    M.goto_node_end(winid, node)
+    M.goto_node_tail(winid, node)
     return true
   elseif mode == "v" then
     -- visual mode
-    M.goto_node_end(winid, node)
+    M.goto_node_tail(winid, node)
     ex("normal! o")
-    M.goto_node_beginning(winid, node)
+    M.goto_node_head(winid, node)
     return true
   else
     jelly.err("unexpected mode for vsel_node: %s", mode)
@@ -164,6 +165,24 @@ do
     assert(#text == 1)
     return text[1]
   end
+end
+
+---@param root TSNode
+---@param ... integer|string @child index, child type
+---@return TSNode?
+function M.get_named_decendant(root, ...)
+  local args = { ... }
+  assert(#args % 2 == 0)
+  local arg_iter = fn.iter(args)
+  ---@type TSNode
+  local next = root
+  for i in arg_iter do
+    local itype = arg_iter()
+    next = next:named_child(i)
+    if next == nil then return jelly.debug("n=%d type.expect=%s .actual=%s", i, itype, "nil") end
+    if next:type() ~= itype then return jelly.debug("n=%d type.expect=%s .actual=%s", i, itype, next:type()) end
+  end
+  return next
 end
 
 return M

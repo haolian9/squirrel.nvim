@@ -13,7 +13,7 @@ function M.goto_node_first_identifier(winid, node)
     target = target:named_child(0)
   end
   assert(target ~= nil)
-  nuts.goto_node_beginning(winid, target)
+  nuts.goto_node_head(winid, target)
 end
 
 ---@param winid number

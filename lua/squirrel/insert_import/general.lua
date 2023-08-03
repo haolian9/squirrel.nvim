@@ -1,7 +1,7 @@
 local ts = vim.treesitter
 local api = vim.api
 local ex = require("infra.ex")
-local jelly = require("infra.jellyfish")("squirrel.imports.insert")
+local jelly = require("infra.jellyfish")("squirrel.import_import.general")
 local nvimkeys = require("infra.nvimkeys")
 
 local nuts = require("squirrel.nuts")
@@ -56,8 +56,8 @@ local import_prefixes = {
   python = [[from ]],
 }
 
-return function(winid)
-  winid = winid or api.nvim_get_current_win()
+return function()
+  local winid = api.nvim_get_current_win()
   local bufnr = api.nvim_win_get_buf(winid)
 
   ---@type TSNode
@@ -88,7 +88,7 @@ return function(winid)
   do
     ex("leftabove split")
     local target_win_id = api.nvim_get_current_win()
-    nuts.goto_node_end(target_win_id, anchor)
+    nuts.goto_node_tail(target_win_id, anchor)
     api.nvim_feedkeys(nvimkeys([[o<cr>]] .. prefix), "ni", false)
   end
 end

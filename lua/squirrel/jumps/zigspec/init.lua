@@ -50,8 +50,8 @@ do
   end
 
   --beginning of previous/next sibling top level function
-  M.motions["[f"] = goto_object(treewalker.find_prev_tip_sibling_fn, nodeops.goto_node_beginning)
-  M.motions["]f"] = goto_object(treewalker.find_next_tip_sibling_fn, nodeops.goto_node_beginning)
+  M.motions["[f"] = goto_object(treewalker.find_prev_tip_sibling_fn, nodeops.goto_node_head)
+  M.motions["]f"] = goto_object(treewalker.find_next_tip_sibling_fn, nodeops.goto_node_head)
 end
 
 return M

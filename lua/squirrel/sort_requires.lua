@@ -19,33 +19,17 @@
 ---
 
 local fn = require("infra.fn")
-local jelly = require("infra.jellyfish")("squirrel.imports.sort")
+local jelly = require("infra.jellyfish")("squirrel.sort_requires")
 local prefer = require("infra.prefer")
 local Regulator = require("infra.Regulator")
 local strlib = require("infra.strlib")
+
+local nuts = require("squirrel.nuts")
 
 local api = vim.api
 local ts = vim.treesitter
 
 ---@alias Require {name: string, node: TSNode}
-
----@param root TSNode
----@param ... integer|string @child index, child type
----@return TSNode?
-local function get_named_decendant(root, ...)
-  local args = { ... }
-  assert(#args % 2 == 0)
-  local arg_iter = fn.iter(args)
-  ---@type TSNode
-  local next = root
-  for i in arg_iter do
-    local itype = arg_iter()
-    next = next:named_child(i)
-    if next == nil then return jelly.debug("n=%d type.expect=%s .actual=%s", i, itype, "nil") end
-    if next:type() ~= itype then return jelly.debug("n=%d type.expect=%s .actual=%s", i, itype, next:type()) end
-  end
-  return next
-end
 
 ---@param bufnr integer
 ---@param root TSNode
@@ -53,7 +37,7 @@ end
 local function find_require_mod_name(bufnr, root)
   if root:type() ~= "variable_declaration" then return end
 
-  local expr_list = get_named_decendant(root, 0, "assignment_statement", 1, "expression_list")
+  local expr_list = nuts.get_named_decendant(root, 0, "assignment_statement", 1, "expression_list")
   if expr_list == nil then return end
 
   ---@type TSNode
@@ -61,7 +45,7 @@ local function find_require_mod_name(bufnr, root)
   do
     ---`local x = require'x'`
     ---`local x = require'x'('x')('y')('z')`
-    local fn_call = get_named_decendant(expr_list, 0, "function_call")
+    local fn_call = nuts.get_named_decendant(expr_list, 0, "function_call")
     if fn_call == nil then return end
     for _ = 1, 5 do
       local child = fn_call:named_child(0)
