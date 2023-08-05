@@ -1,3 +1,4 @@
+local Ephemeral = require("infra.Ephemeral")
 local ex = require("infra.ex")
 local prefer = require("infra.prefer")
 
@@ -15,15 +16,12 @@ return function()
     ---@type squirrel.folding.fold_expr
     local foldexpr = assert(exprs[ft], "unsupported ft")
 
-    local line_count = api.nvim_buf_line_count(bufnr)
-    new_bufnr = api.nvim_create_buf(false, true)
-    prefer.bo(new_bufnr, "bufhidden", "wipe")
     local lines = {}
-    for i = 0, line_count do
+    for i = 0, api.nvim_buf_line_count(bufnr) do
       local lv = foldexpr(i)
       table.insert(lines, string.format("%s|%d", string.rep(" ", lv), lv))
     end
-    api.nvim_buf_set_lines(new_bufnr, 0, -1, false, lines)
+    new_bufnr = Ephemeral(nil, lines)
   end
 
   local new_win_id

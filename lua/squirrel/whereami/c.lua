@@ -1,3 +1,4 @@
+local Ephemeral = require("infra.Ephemeral")
 local fn = require("infra.fn")
 local prefer = require("infra.prefer")
 
@@ -54,6 +55,8 @@ local function resolve_route(winid)
     if stop ~= nil then table.insert(stops, stop) end
   end
 
+  if #stops == 1 then return end
+
   return table.concat(stops, "/")
 end
 
@@ -66,14 +69,7 @@ return function()
   local route = resolve_route(api.nvim_get_current_win())
   if route == nil then return end
 
-  local bufnr
-  do
-    bufnr = api.nvim_create_buf(false, true)
-    local bo = prefer.buf(bufnr)
-    bo.bufhidden = "wipe"
-    api.nvim_buf_set_lines(bufnr, 0, -1, false, { route })
-    bo.modifiable = false
-  end
+  local bufnr = Ephemeral(nil, { route })
 
   local winid = api.nvim_open_win(bufnr, false, { relative = "cursor", row = -1, col = 0, width = #route, height = 1 })
   api.nvim_win_set_hl_ns(winid, facts.floatwin_ns)

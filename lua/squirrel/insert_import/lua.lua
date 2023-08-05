@@ -1,5 +1,6 @@
 local bufrename = require("infra.bufrename")
 local ctx = require("infra.ctx")
+local Ephemeral = require("infra.Ephemeral")
 local ex = require("infra.ex")
 local fn = require("infra.fn")
 local handyclosekeys = require("infra.handyclosekeys")
@@ -61,10 +62,13 @@ return function()
 
   local bufnr
   do
-    bufnr = api.nvim_create_buf(false, true)
-    local bo = prefer.buf(bufnr)
-    bo.bufhidden = "wipe"
+    bufnr = Ephemeral({ modifiable = true, undolevels = 1 }, { 'require""' })
+
     bufrename(bufnr, string.format("imports://buf/%d", host_bufnr))
+
+    --todo: lsp completion will not work if this line is above the bufrename()
+    prefer.bo(bufnr, "filetype", "lua")
+
     api.nvim_create_autocmd("bufwipeout", {
       buffer = bufnr,
       once = true,
@@ -78,16 +82,11 @@ return function()
         jelly.info("'%s'", require_stat)
       end,
     })
+
     local bm = bufmap.wraps(bufnr)
     handyclosekeys(bufnr)
     bm.i("<cr>", "<cmd>stopinsert<bar>q<cr>")
     bm.i("<c-c>", "<cmd>stopinsert<bar>q<cr>")
-
-    ctx.no_undo(bufnr, function()
-      api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'require""' })
-      --have to set filetype here to enable lsp's complete
-      prefer.bo(bufnr, "filetype", "lua")
-    end)
   end
 
   do

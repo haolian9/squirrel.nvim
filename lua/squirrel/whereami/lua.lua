@@ -1,3 +1,4 @@
+local Ephemeral = require("infra.Ephemeral")
 local fn = require("infra.fn")
 local jelly = require("infra.jellyfish")("squirrel.whereami")
 local prefer = require("infra.prefer")
@@ -36,7 +37,7 @@ local function resolve_stop_name(bufnr, node)
   if #fields == 1 then
     local name = fields[1]
     local ntype = name:type()
-    assert(ntype == "identifier" or ntype == "method_index_expression", ntype)
+    assert(ntype == "identifier" or ntype == "method_index_expression" or ntype == "dot_index_expression", ntype)
     return nuts.get_node_lines(bufnr, name)[1]
   end
   error("unreachable: multiple name field")
@@ -62,14 +63,7 @@ return function()
   local route = resolve_route(api.nvim_get_current_win())
   if route == nil then return end
 
-  local bufnr
-  do
-    bufnr = api.nvim_create_buf(false, true)
-    local bo = prefer.buf(bufnr)
-    bo.bufhidden = "wipe"
-    api.nvim_buf_set_lines(bufnr, 0, -1, false, { route })
-    bo.modifiable = false
-  end
+  local bufnr = Ephemeral(nil, { route })
 
   local winid = api.nvim_open_win(bufnr, false, { relative = "cursor", row = -1, col = 0, width = #route, height = 1 })
   api.nvim_win_set_hl_ns(winid, facts.floatwin_ns)
