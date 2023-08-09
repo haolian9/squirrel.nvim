@@ -10,7 +10,6 @@ do
   if vim.go.background == "light" then
     hi("NormalFloat", { fg = 1, bold = true })
   else
-    --todo
     hi("NormalFloat", { fg = 1, bold = true })
   end
 

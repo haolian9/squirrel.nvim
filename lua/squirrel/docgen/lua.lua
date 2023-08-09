@@ -93,7 +93,6 @@ return function()
 
   local anns = {}
   do
-    -- todo: respect indent
     for i in fn.range(params_node:named_child_count()) do
       local node = params_node:named_child(i)
       local text = ts.get_node_text(node, bufnr)
@@ -109,9 +108,7 @@ return function()
   local start_line = fn_node:range()
   api.nvim_buf_set_lines(bufnr, start_line, start_line, false, anns)
 
-  -- search `any` in generated annotation for easier editing
-  do
-    -- todo: move to infra.vsel
+  do -- search `any` in generated annotation for easier editing
     vsel.select_lines(start_line, start_line + #anns + 1)
     vim.fn.setreg("/", [[\%Vany$]])
     api.nvim_feedkeys(nvimkeys([[<esc>/<cr>]]), "n", false)

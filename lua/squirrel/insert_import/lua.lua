@@ -46,7 +46,6 @@ local function resolve_require_stat(line)
     local mod = string.match(line, '^require"(.+)"')
     assert(mod)
     as = mod
-    --todo: could be merged into the mod match
     local start = strlib.rfind(mod, ".")
     if start ~= nil then as = string.sub(mod, start + 1) end
   end
@@ -65,8 +64,7 @@ return function()
     bufnr = Ephemeral({ modifiable = true, undolevels = 1 }, { 'require""' })
 
     bufrename(bufnr, string.format("imports://buf/%d", host_bufnr))
-
-    --todo: lsp completion will not work if this line is above the bufrename()
+    --NB: lsp completion will not work if this line is above the bufrename()
     prefer.bo(bufnr, "filetype", "lua")
 
     api.nvim_create_autocmd("bufwipeout", {
