@@ -1,15 +1,10 @@
-local bufrename = require("infra.bufrename")
-local ctx = require("infra.ctx")
-local Ephemeral = require("infra.Ephemeral")
-local ex = require("infra.ex")
 local fn = require("infra.fn")
-local handyclosekeys = require("infra.handyclosekeys")
-local jelly = require("infra.jellyfish")("squirrel.import_import.lua")
-local bufmap = require("infra.keymap.buffer")
+local jelly = require("infra.jellyfish")("squirrel.insert_import.lua")
 local prefer = require("infra.prefer")
 local strlib = require("infra.strlib")
 
 local nuts = require("squirrel.nuts")
+local tui = require("tui")
 
 local api = vim.api
 local ts = vim.treesitter
@@ -39,8 +34,6 @@ end
 ---@param line string
 ---@return string?
 local function resolve_require_stat(line)
-  if #line <= #'#require""' then return jelly.debug("canceled") end
-
   local as
   do
     local mod = string.match(line, '^require"(.+)"')
@@ -59,37 +52,22 @@ return function()
   local anchor = find_first_require(host_bufnr)
   if anchor == nil then return jelly.debug("unable to find a place to add require") end
 
-  local bufnr
-  do
-    bufnr = Ephemeral({ modifiable = true, undolevels = 1 }, { 'require""' })
+  tui.input({
+    prompt = "require",
+    startinsert = true,
+    wincall = function(winid, bufnr)
+      api.nvim_buf_set_lines(bufnr, 0, 1, false, { [[require""]] })
+      --NB: lsp completion will not work if this line is above the bufrename()
+      prefer.bo(bufnr, "filetype", "lua")
+      api.nvim_win_set_cursor(winid, { 1, #[[require"]] })
+    end,
+  }, function(line)
+    if line == nil or line == "" then return end
+    local require_stat = resolve_require_stat(line)
+    if require_stat == nil then return end
 
-    bufrename(bufnr, string.format("imports://buf/%d", host_bufnr))
-    --NB: lsp completion will not work if this line is above the bufrename()
-    prefer.bo(bufnr, "filetype", "lua")
-
-    api.nvim_create_autocmd("bufwipeout", {
-      buffer = bufnr,
-      once = true,
-      callback = function()
-        local line = api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
-        local require_stat = resolve_require_stat(line)
-        if require_stat == nil then return end
-
-        local anchor_tail = anchor:end_() + 1
-        api.nvim_buf_set_lines(host_bufnr, anchor_tail, anchor_tail, false, { require_stat })
-        jelly.info("'%s'", require_stat)
-      end,
-    })
-
-    local bm = bufmap.wraps(bufnr)
-    handyclosekeys(bufnr)
-    bm.i("<cr>", "<cmd>stopinsert<bar>q<cr>")
-    bm.i("<c-c>", "<cmd>stopinsert<bar>q<cr>")
-  end
-
-  do
-    local winid = api.nvim_open_win(bufnr, true, { relative = "cursor", width = 50, height = 1, row = -1, col = 0 })
-    api.nvim_win_set_cursor(winid, { 1, #'require"' })
-    ex("startinsert")
-  end
+    local anchor_tail = anchor:end_() + 1
+    api.nvim_buf_set_lines(host_bufnr, anchor_tail, anchor_tail, false, { require_stat })
+    jelly.info("'%s'", require_stat)
+  end)
 end
