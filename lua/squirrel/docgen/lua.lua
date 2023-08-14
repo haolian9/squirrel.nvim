@@ -109,7 +109,7 @@ return function()
   api.nvim_buf_set_lines(bufnr, start_line, start_line, false, anns)
 
   do -- search `any` in generated annotation for easier editing
-    vsel.select_lines(start_line, start_line + #anns + 1)
+    vsel.select_lines(winid, start_line, start_line + #anns + 1)
     vim.fn.setreg("/", [[\%Vany$]])
     api.nvim_feedkeys(nvimkeys([[<esc>/<cr>]]), "n", false)
   end

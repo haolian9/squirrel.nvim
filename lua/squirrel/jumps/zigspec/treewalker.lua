@@ -7,7 +7,7 @@ M.find_tip_fn = (function()
     ---@type TSNode?
     local node = start
     while node ~= nil do
-      if node:type() == "TopLevelDecl" then return node end
+      if node:type() == "Decl" then return node end
       node = node:parent()
     end
   end

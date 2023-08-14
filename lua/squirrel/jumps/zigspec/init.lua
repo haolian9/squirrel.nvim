@@ -29,7 +29,7 @@ do
 
   --parent function
   M.objects["if"] = vsel_object(treewalker.find_tip_fn, nodeops.vsel_node_body)
-  M.objects.af = vsel_object(treewalker.find_tip_fn, nodeops.vsel_node)
+  M.objects["af"] = vsel_object(treewalker.find_tip_fn, nodeops.vsel_node)
 
   --function call
   M.objects["ic"] = vsel_object(treewalker.find_parent_call, nodeops.vsel_node)
@@ -52,6 +52,9 @@ do
   --beginning of previous/next sibling top level function
   M.motions["[f"] = goto_object(treewalker.find_prev_tip_sibling_fn, nodeops.goto_node_head)
   M.motions["]f"] = goto_object(treewalker.find_next_tip_sibling_fn, nodeops.goto_node_head)
+  --beginning/ending of the current function
+  M.motions["<f"] = goto_object(treewalker.find_tip_fn, nodeops.goto_node_first_identifier)
+  M.motions[">f"] = goto_object(treewalker.find_tip_fn, nuts.goto_node_tail)
 end
 
 return M
