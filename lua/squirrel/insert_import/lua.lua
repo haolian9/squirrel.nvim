@@ -21,13 +21,21 @@ do
     if ident:type() ~= "identifier" then return false end
     return true
   end
-  ---@return TSNode?
+
+  ---@type TSNode
+  local zero = {}
+  function zero:start() return -1, 0 end
+  function zero:end_() return -1, 0 end
+  function zero:range() return -1, 0, -1, 0 end
+
+  ---@return TSNode
   function find_first_require(bufnr)
     local root = assert(ts.get_parser(bufnr):trees()[1]):root()
     for idx in fn.range(root:named_child_count()) do
       local child = root:named_child(idx)
       if is_require_node(child) then return child end
     end
+    return zero
   end
 end
 
@@ -50,7 +58,6 @@ return function()
   local host_bufnr = api.nvim_get_current_buf()
 
   local anchor = find_first_require(host_bufnr)
-  if anchor == nil then return jelly.debug("unable to find a place to add require") end
 
   tui.input({
     prompt = "require",
