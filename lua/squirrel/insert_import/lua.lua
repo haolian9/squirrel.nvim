@@ -9,7 +9,7 @@ local tui = require("tui")
 local api = vim.api
 local ts = vim.treesitter
 
-local find_first_require
+local find_anchor
 do
   ---@param node TSNode
   local function is_require_node(node)
@@ -22,21 +22,24 @@ do
     return true
   end
 
-  ---@type TSNode
-  local zero = {}
-  function zero:start() return -1, 0 end
-  function zero:end_() return -1, 0 end
-  function zero:range() return -1, 0, -1, 0 end
-
-  ---@return TSNode
-  function find_first_require(bufnr)
+  ---@param bufnr integer
+  ---@return TSNode?
+  local function first_require(bufnr)
     local root = assert(ts.get_parser(bufnr):trees()[1]):root()
     for idx in fn.range(root:named_child_count()) do
       local child = root:named_child(idx)
       if is_require_node(child) then return child end
     end
-    return zero
   end
+
+  ---@type TSNode
+  local origin = {}
+  function origin:start() return -1, 0 end
+  function origin:end_() return -1, 0 end
+  function origin:range() return -1, 0, -1, 0 end
+
+  ---@return TSNode
+  function find_anchor(bufnr) return first_require(bufnr) or origin end
 end
 
 local resolve_require_stat
@@ -73,7 +76,7 @@ end
 return function()
   local host_bufnr = api.nvim_get_current_buf()
 
-  local anchor = find_first_require(host_bufnr)
+  local anchor = find_anchor(host_bufnr)
 
   tui.input({
     prompt = "require",
