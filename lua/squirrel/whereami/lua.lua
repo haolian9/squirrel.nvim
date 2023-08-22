@@ -65,10 +65,12 @@ return function()
 
   local bufnr = Ephemeral(nil, { route })
 
-  local winid = api.nvim_open_win(bufnr, false, { relative = "cursor", row = -1, col = 0, width = #route, height = 1 })
+  local winopts = { relative = "cursor", row = -1, col = 0, width = #route, height = 1 }
+  local winid = api.nvim_open_win(bufnr, false, winopts)
   api.nvim_win_set_hl_ns(winid, facts.floatwin_ns)
 
   vim.defer_fn(function()
-    if api.nvim_win_is_valid(winid) then api.nvim_win_close(winid, false) end
+    if api.nvim_win_is_valid(winid) then return end
+    api.nvim_win_close(winid, false)
   end, 1000 * 3)
 end

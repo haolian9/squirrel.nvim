@@ -39,19 +39,35 @@ do
   end
 end
 
----@param line string
----@return string?
-local function resolve_require_stat(line)
-  local as
-  do
+local resolve_require_stat
+do
+  local aliases = {
+    ["infra.keymap.buffer"] = "bufmap",
+    ["infra.keymap.global"] = "m",
+  }
+
+  ---@param line string
+  ---@return string?
+  local function resolve_as(line)
     local mod = string.match(line, '^require"(.+)"')
-    assert(mod)
-    as = mod
+    if mod == nil then return end
+
+    local alias = aliases[mod]
+    if alias ~= nil then return alias end
+
     local start = strlib.rfind(mod, ".")
-    if start ~= nil then as = string.sub(mod, start + 1) end
+    if start == nil then return mod end
+
+    return string.sub(mod, start + 1)
   end
 
-  return string.format("local %s = %s", as, line)
+  ---@param line string
+  ---@return string?
+  function resolve_require_stat(line)
+    local as = resolve_as(line)
+    if as == nil then return end
+    return string.format("local %s = %s", as, line)
+  end
 end
 
 return function()

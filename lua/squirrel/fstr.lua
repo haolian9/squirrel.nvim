@@ -1,6 +1,3 @@
----design choices
----* when cursor is placed outside of string, `|""` or `""|`, triggers not
-
 local jelly = require("infra.jellyfish")("squirrel.fstr")
 local prefer = require("infra.prefer")
 
@@ -17,21 +14,25 @@ local function find_str_at_cursor(winid)
     if node:type() == "string" then return node end
     node = node:parent()
   end
-  return jelly.info("no string around")
+  return jelly.warn("no string around")
 end
 
----toggle fstr. only for python buffer
+--supported cases: "|", |"", ""|
+--
+--design choices:
+--* for python buffers of course
+--* relying on treesitter
+--* no cursor movement
 return function()
   local winid = api.nvim_get_current_win()
   local bufnr = api.nvim_win_get_buf(winid)
-
-  if prefer.bo(bufnr, "filetype") ~= "python" then return jelly.err("only support python buffer") end
+  assert(prefer.bo(bufnr, "filetype") ~= "python")
 
   local str_node = find_str_at_cursor(winid)
   if str_node == nil then return end
 
-  local start_line, start_col = str_node:range()
-  local start_char = api.nvim_buf_get_text(bufnr, start_line, start_col, start_line, start_col + 1, {})[1]
+  local start_char = nuts.get_node_first_char(bufnr, str_node)
+  local start_line, start_col = str_node:start()
 
   if start_char == "f" then
     api.nvim_buf_set_text(bufnr, start_line, start_col, start_line, start_col + 1, { "" })
