@@ -26,7 +26,7 @@ end
 return function()
   local winid = api.nvim_get_current_win()
   local bufnr = api.nvim_win_get_buf(winid)
-  assert(prefer.bo(bufnr, "filetype") ~= "python")
+  assert(prefer.bo(bufnr, "filetype") == "python")
 
   local str_node = find_str_at_cursor(winid)
   if str_node == nil then return end
