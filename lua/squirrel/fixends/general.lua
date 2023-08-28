@@ -25,7 +25,7 @@ do
     if cursor_col == 0 then return jelly.debug("blank line") end
     local start_col = math.max(cursor_col - multiline_pairs[#multiline_pairs][1], 0)
     local text = api.nvim_buf_get_text(bufnr, cursor_line, start_col, cursor_line, cursor_col, {})
-    jelly.info("prompt texts: %s", vim.inspect(text))
+    jelly.info("prompt texts: %s", text)
     local prompt = text[1]
     if prompt == "" then return end
     return prompt
