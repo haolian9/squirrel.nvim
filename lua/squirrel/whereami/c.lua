@@ -76,7 +76,7 @@ return function()
   api.nvim_win_set_hl_ns(winid, facts.floatwin_ns)
 
   vim.defer_fn(function()
-    if api.nvim_win_is_valid(winid) then return end
+    if not api.nvim_win_is_valid(winid) then return end
     api.nvim_win_close(winid, false)
   end, 1000 * 3)
 end
