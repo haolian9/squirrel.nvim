@@ -1,6 +1,6 @@
 local Ephemeral = require("infra.Ephemeral")
-local ex = require("infra.ex")
 local prefer = require("infra.prefer")
+local winsplit = require("infra.winsplit")
 
 local exprs = require("squirrel.folding.exprs")
 
@@ -27,7 +27,7 @@ return function()
   local new_win_id
   -- setup new win & buf
   do
-    ex("leftabove vsplit")
+    winsplit("left")
     new_win_id = api.nvim_get_current_win()
     api.nvim_win_set_width(new_win_id, 20)
     local wo = prefer.win(new_win_id)

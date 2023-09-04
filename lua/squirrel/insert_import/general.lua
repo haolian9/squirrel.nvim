@@ -3,6 +3,7 @@ local api = vim.api
 local ex = require("infra.ex")
 local jelly = require("infra.jellyfish")("squirrel.import_import.general")
 local nvimkeys = require("infra.nvimkeys")
+local winsplit = require("infra.winsplit")
 
 local nuts = require("squirrel.nuts")
 
@@ -86,7 +87,7 @@ return function()
 
   -- locate cursor in a vsplit
   do
-    ex("leftabove split")
+    winsplit("above")
     local target_win_id = api.nvim_get_current_win()
     nuts.goto_node_tail(target_win_id, anchor)
     api.nvim_feedkeys(nvimkeys([[o<cr>]] .. prefix), "ni", false)
