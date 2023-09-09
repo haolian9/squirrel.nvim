@@ -1,6 +1,5 @@
 local ts = vim.treesitter
 local api = vim.api
-local ex = require("infra.ex")
 local jelly = require("infra.jellyfish")("squirrel.import_import.general")
 local nvimkeys = require("infra.nvimkeys")
 local winsplit = require("infra.winsplit")

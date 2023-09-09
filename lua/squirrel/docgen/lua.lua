@@ -11,6 +11,7 @@ local jumplist = require("infra.jumplist")
 local nvimkeys = require("infra.nvimkeys")
 local vsel = require("infra.vsel")
 
+local parrot = require("parrot")
 local nuts = require("squirrel.nuts")
 
 local ts = vim.treesitter
@@ -42,6 +43,7 @@ local function find_params_node(fn_node)
 end
 
 ---@param fn_node TSNode
+---@return string?
 local function resolve_return_type(fn_node)
   local body_node = fn_node:field("body")[1]
   if body_node == nil then return end
@@ -68,19 +70,8 @@ local function resolve_return_type(fn_node)
       end
     end
   end
-  if return_nil then
-    if return_any then
-      return "any?"
-    else
-      return
-    end
-  else
-    if return_any then
-      return "any"
-    else
-      return
-    end
-  end
+
+  if return_any then return return_nil and "${1:any}?" or "${1:any}" end
 end
 
 return function()
@@ -96,21 +87,14 @@ return function()
     for i in fn.range(params_node:named_child_count()) do
       local node = params_node:named_child(i)
       local text = ts.get_node_text(node, bufnr)
-      table.insert(anns, string.format("---@param %s any", text))
+      table.insert(anns, string.format("---@param %s $1", text))
     end
     local return_type = resolve_return_type(fn_node)
     if return_type then table.insert(anns, string.format("---@return " .. return_type)) end
     if #anns == 0 then return end
+    table.insert(anns, "")
   end
 
-  jumplist.push_here()
-
-  local start_line = fn_node:range()
-  api.nvim_buf_set_lines(bufnr, start_line, start_line, false, anns)
-
-  do -- search `any` in generated annotation for easier editing
-    vsel.select_lines(winid, start_line, start_line + #anns + 1)
-    vim.fn.setreg("/", [[\%Vany$]])
-    api.nvim_feedkeys(nvimkeys([[<esc>/<cr>]]), "n", false)
-  end
+  local insert_lnum, insert_col = fn_node:range()
+  parrot.expand_external_chirps(anns, winid, insert_lnum, insert_col, false)
 end
