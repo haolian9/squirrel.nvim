@@ -28,7 +28,10 @@ function M.get_node_at_cursor(winid)
     if col == llen then col = math.max(col - 1, 0) end
   end
 
-  return assert(ts.get_node({ bufnr = bufnr, pos = { lnum, col }, ignore_injections = true }))
+  local node = ts.get_node({ bufnr = bufnr, pos = { lnum, col }, ignore_injections = true })
+  assert(node, "no tsnode at cursor")
+
+  return node
 end
 
 ---@alias squirrel.nuts.goto_node fun(winid: number, node: TSNode)
