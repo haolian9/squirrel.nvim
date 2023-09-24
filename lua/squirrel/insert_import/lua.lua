@@ -4,7 +4,7 @@ local prefer = require("infra.prefer")
 local strlib = require("infra.strlib")
 
 local nuts = require("squirrel.nuts")
-local tui = require("tui")
+local puff = require("puff")
 
 local api = vim.api
 local ts = vim.treesitter
@@ -75,18 +75,17 @@ end
 
 return function()
   local host_bufnr = api.nvim_get_current_buf()
-
   local anchor = find_anchor(host_bufnr)
 
-  tui.input({
+  puff.input({
     prompt = "require",
     startinsert = true,
-    wincall = function(winid, bufnr)
-      api.nvim_buf_set_lines(bufnr, 0, 1, false, { [[require""]] })
-      --NB: lsp completion will not work if this line is above the bufrename()
+    bufcall = function(bufnr)
+      --NB: lsp.client.on_attach would change something to the buffer, which conflicts with puff.input
       prefer.bo(bufnr, "filetype", "lua")
-      api.nvim_win_set_cursor(winid, { 1, #[[require"]] })
+      api.nvim_buf_set_lines(bufnr, 0, 1, false, { [[require""]] })
     end,
+    wincall = function(winid) api.nvim_win_set_cursor(winid, { 1, #[[require"]] }) end,
   }, function(line)
     if line == nil or line == "" then return end
     local require_stat = resolve_require_stat(line)
