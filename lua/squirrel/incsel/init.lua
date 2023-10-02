@@ -27,8 +27,10 @@ do
     do -- cleanup map
       api.nvim_buf_del_keymap(self.bufnr, "x", "m")
       api.nvim_buf_del_keymap(self.bufnr, "x", "n")
-      api.nvim_buf_del_keymap(self.bufnr, "x", [[<esc>]])
-      api.nvim_buf_del_keymap(self.bufnr, "n", [[<esc>]])
+      api.nvim_buf_del_keymap(self.bufnr, "x", "<esc>")
+      api.nvim_buf_del_keymap(self.bufnr, "n", "<esc>")
+      api.nvim_buf_del_keymap(self.bufnr, "x", "<c-[>")
+      api.nvim_buf_del_keymap(self.bufnr, "n", "<c-[>")
     end
     do -- cleanup state
       self.started = false
@@ -86,9 +88,12 @@ do
       local bm = bufmap.wraps(self.bufnr)
       bm.x("m", function() self:increase() end)
       bm.x("n", function() self:decrease() end)
+
       -- ModeChanged is not reliable, so we hijack the <esc>
       bm.x("<esc>", function() self:deinit() end)
       bm.n("<esc>", function() self:deinit() end)
+      bm.x("<c-[>", function() self:deinit() end)
+      bm.n("<c-[>", function() self:deinit() end)
     end
 
     --it's possible to call state:init() multiple times but the buffer has no changes even once
