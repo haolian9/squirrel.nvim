@@ -6,6 +6,7 @@ local M = {}
 
 local api = vim.api
 
+local BufSubmode = require("infra.BufSubmode")
 local jelly = require("infra.jellyfish")("squirrel.incsel")
 local bufmap = require("infra.keymap.buffer")
 
@@ -13,24 +14,21 @@ local startpoints = require("squirrel.incsel.startpoints")
 local nuts = require("squirrel.nuts")
 
 ---@class squirrel.incsel.state
-local state = {
-  started = false,
-  winid = nil,
-  bufnr = nil,
-  ---@type TSNode[]
-  path = nil,
-  attached = false,
-}
+local state = {}
 do
+  state.started = false
+  state.winid = nil
+  state.bufnr = nil
+  ---@type TSNode[]
+  state.path = nil
+  state.attached = false --flag for nvim_buf_attach
+  state.submode_deinit = nil
+
   function state:deinit()
     assert(self.started)
-    do -- cleanup map
-      api.nvim_buf_del_keymap(self.bufnr, "x", "m")
-      api.nvim_buf_del_keymap(self.bufnr, "x", "n")
-      api.nvim_buf_del_keymap(self.bufnr, "x", "<esc>")
-      api.nvim_buf_del_keymap(self.bufnr, "n", "<esc>")
-      api.nvim_buf_del_keymap(self.bufnr, "x", "<c-[>")
-      api.nvim_buf_del_keymap(self.bufnr, "n", "<c-[>")
+    do -- cleanup submode keymaps
+      self.submode_deinit()
+      self.submode_deinit = nil
     end
     do -- cleanup state
       self.started = false
@@ -85,6 +83,15 @@ do
     assert(nuts.vsel_node(self.winid, self.path[1]))
 
     do -- set keymaps
+      self.submode_deinit = BufSubmode(self.bufnr, {
+        { "x", "m" },
+        { "x", "n" },
+        { "x", "<esc>" },
+        { "n", "<esc>" },
+        { "x", "<c-[>" },
+        { "n", "<c-[>" },
+      })
+
       local bm = bufmap.wraps(self.bufnr)
       bm.x("m", function() self:increase() end)
       bm.x("n", function() self:decrease() end)
