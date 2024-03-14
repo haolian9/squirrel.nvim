@@ -6,7 +6,7 @@ local M = {}
 
 local api = vim.api
 
-local BufSubmode = require("infra.BufSubmode")
+local ctx = require("infra.ctx")
 local jelly = require("infra.jellyfish")("squirrel.incsel")
 local bufmap = require("infra.keymap.buffer")
 
@@ -83,7 +83,7 @@ do
     assert(nuts.vsel_node(self.winid, self.path[1]))
 
     do -- set keymaps
-      self.submode_deinit = BufSubmode(self.bufnr, {
+      self.submode_deinit = ctx.bufsubmode(self.bufnr, {
         { "x", "m" },
         { "x", "n" },
         { "x", "<esc>" },
