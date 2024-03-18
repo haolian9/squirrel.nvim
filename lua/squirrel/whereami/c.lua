@@ -1,6 +1,7 @@
 local Ephemeral = require("infra.Ephemeral")
 local fn = require("infra.fn")
 local prefer = require("infra.prefer")
+local rifts = require("infra.rifts")
 
 local nuts = require("squirrel.nuts")
 local facts = require("squirrel.whereami.facts")
@@ -72,7 +73,7 @@ return function()
   local bufnr = Ephemeral(nil, { route })
 
   local winopts = { relative = "cursor", row = -1, col = 0, width = #route, height = 1 }
-  local winid = api.nvim_open_win(bufnr, false, winopts)
+  local winid = rifts.open.win(bufnr, false, winopts)
   api.nvim_win_set_hl_ns(winid, facts.floatwin_ns)
 
   vim.defer_fn(function()
