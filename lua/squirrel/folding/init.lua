@@ -4,14 +4,9 @@ local prefer = require("infra.prefer")
 
 local api = vim.api
 
-function M.attach(ft)
-  local winid = api.nvim_get_current_win()
-
-  if ft == nil then
-    local bufnr = api.nvim_win_get_buf(winid)
-    ft = prefer.bo(bufnr, "filetype")
-  end
-
+---@param winid integer
+---@param ft string
+function M.attach(winid, ft)
   local wo = prefer.win(winid)
   wo.foldmethod = "expr"
   wo.foldlevel = 1
