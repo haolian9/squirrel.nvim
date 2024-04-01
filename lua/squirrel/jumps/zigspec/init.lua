@@ -43,9 +43,11 @@ do
   local function goto_object(finder, gotoer)
     return function(winid)
       winid = winid or api.nvim_get_current_win()
-      local target = finder(nuts.get_node_at_cursor(winid))
-      if target == nil then return jelly.info("no objects available") end
-      gotoer(winid, target)
+      for _ = 1, vim.v.count1 do
+        local target = finder(nuts.get_node_at_cursor(winid))
+        if target == nil then return jelly.info("no objects available") end
+        gotoer(winid, target)
+      end
     end
   end
 
