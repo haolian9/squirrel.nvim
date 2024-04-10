@@ -98,7 +98,7 @@ function M.goto_peer(winid)
   winid = winid or api.nvim_get_current_win()
   if not peerouter(winid) then
     -- fallback to native %
-    ex("normal! %")
+    ex.eval("normal! %")
   end
 end
 

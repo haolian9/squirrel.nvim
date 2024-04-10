@@ -61,13 +61,13 @@ function M.vsel_node(winid, node)
   if mode == "no" or mode == "n" then
     -- operator-pending mode
     M.goto_node_head(winid, node)
-    ex("normal! v")
+    ex.eval("normal! v")
     M.goto_node_tail(winid, node)
     return true
   elseif mode == "v" then
     -- visual mode
     M.goto_node_tail(winid, node)
-    ex("normal! o")
+    ex.eval("normal! o")
     M.goto_node_head(winid, node)
     return true
   else
