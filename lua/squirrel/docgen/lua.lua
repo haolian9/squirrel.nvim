@@ -7,9 +7,6 @@
 
 local fn = require("infra.fn")
 local jelly = require("infra.jellyfish")("squirrel.docgen", "INFO")
-local jumplist = require("infra.jumplist")
-local nvimkeys = require("infra.nvimkeys")
-local vsel = require("infra.vsel")
 
 local parrot = require("parrot")
 local nuts = require("squirrel.nuts")

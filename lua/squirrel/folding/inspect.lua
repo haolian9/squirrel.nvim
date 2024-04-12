@@ -1,3 +1,4 @@
+local buflines = require("infra.buflines")
 local Ephemeral = require("infra.Ephemeral")
 local prefer = require("infra.prefer")
 local winsplit = require("infra.winsplit")
@@ -17,7 +18,7 @@ return function()
     local foldexpr = assert(exprs[ft], "unsupported ft")
 
     local lines = {}
-    for i = 0, api.nvim_buf_line_count(bufnr) do
+    for i = 0, buflines.count(bufnr) do
       local lv = foldexpr(i)
       table.insert(lines, string.format("%s|%d", string.rep(" ", lv), lv))
     end

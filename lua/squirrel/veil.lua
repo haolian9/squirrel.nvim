@@ -1,5 +1,6 @@
 local M = {}
 
+local buflines = require("infra.buflines")
 local jelly = require("infra.jellyfish")("squirrel.veil", "info")
 local prefer = require("infra.prefer")
 local resolve_line_indents = require("infra.resolve_line_indents")
@@ -29,7 +30,7 @@ function M.cover(ft, bufnr)
   local lines
   do
     local indents, ichar, iunit = resolve_line_indents(bufnr, range.start_line)
-    lines = api.nvim_buf_get_lines(bufnr, range.start_line, range.stop_line, false)
+    lines = buflines.lines(bufnr, range.start_line, range.stop_line)
     do
       local add = string.rep(ichar, iunit)
       for i = 1, #lines do
@@ -43,7 +44,7 @@ function M.cover(ft, bufnr)
     end
   end
 
-  api.nvim_buf_set_lines(bufnr, range.start_line, range.stop_line, false, lines)
+  buflines.replaces(bufnr, range.start_line, range.stop_line, lines)
 end
 
 function M.uncover(ft, bufnr)

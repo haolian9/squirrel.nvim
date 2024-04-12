@@ -18,6 +18,7 @@
 ---  * others: ...
 ---
 
+local buflines = require("infra.buflines")
 local fn = require("infra.fn")
 local jelly = require("infra.jellyfish")("squirrel.sort_requires")
 local prefer = require("infra.prefer")
@@ -215,11 +216,11 @@ return function(bufnr)
   end
 
   do
-    local old_lines = api.nvim_buf_get_lines(bufnr, start_line, stop_line, false)
+    local old_lines = buflines.lines(bufnr, start_line, stop_line)
     local no_changes = fn.iter_equals(sorted_lines, old_lines)
     if no_changes then return jelly.debug("no changes in the require section") end
   end
 
-  api.nvim_buf_set_lines(bufnr, start_line, stop_line, false, sorted_lines)
+  buflines.replaces(bufnr, start_line, stop_line, sorted_lines)
   regulator:update(bufnr)
 end

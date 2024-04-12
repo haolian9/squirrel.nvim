@@ -5,6 +5,7 @@
 
 local ts = vim.treesitter
 local api = vim.api
+local buflines = require("infra.buflines")
 local jelly = require("infra.jellyfish")("squirrel.docgen.go")
 local jumplist = require("infra.jumplist")
 local nvimkeys = require("infra.nvimkeys")
@@ -51,7 +52,7 @@ local function try_field_ann(start, winid, bufnr)
 
   jumplist.push_here()
 
-  api.nvim_buf_set_lines(bufnr, r0, r0, false, { ann })
+  buflines.prepend(bufnr, r0, ann)
 
   -- search `desc` in generated annotation for easier editing
   do

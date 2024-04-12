@@ -1,10 +1,11 @@
+local buflines = require("infra.buflines")
 local fn = require("infra.fn")
 local jelly = require("infra.jellyfish")("squirrel.insert_import.lua")
 local prefer = require("infra.prefer")
 local strlib = require("infra.strlib")
 
-local nuts = require("squirrel.nuts")
 local puff = require("puff")
+local nuts = require("squirrel.nuts")
 
 local api = vim.api
 local ts = vim.treesitter
@@ -83,7 +84,7 @@ return function()
     bufcall = function(bufnr)
       --NB: lsp.client.on_attach would change something to the buffer, which conflicts with puff.input
       prefer.bo(bufnr, "filetype", "lua")
-      api.nvim_buf_set_lines(bufnr, 0, 1, false, { [[require""]] })
+      buflines.replace(bufnr, 0, 'require""')
     end,
     wincall = function(winid) api.nvim_win_set_cursor(winid, { 1, #[[require"]] }) end,
   }, function(line)
@@ -92,7 +93,7 @@ return function()
     if require_stat == nil then return end
 
     local anchor_tail = anchor:end_() + 1
-    api.nvim_buf_set_lines(host_bufnr, anchor_tail, anchor_tail, false, { require_stat })
+    buflines.prepend(host_bufnr, anchor_tail, require_stat)
     jelly.info("'%s'", require_stat)
   end)
 end
