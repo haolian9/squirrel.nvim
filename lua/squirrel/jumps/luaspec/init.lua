@@ -1,8 +1,8 @@
 local M = {}
 
 local ex = require("infra.ex")
+local feedkeys = require("infra.feedkeys")
 local jelly = require("infra.jellyfish")("squirrel.jumps.luaspec")
-local nvimkeys = require("infra.nvimkeys")
 
 local nodeops = require("squirrel.jumps.luaspec.nodeops")
 local peerouter = require("squirrel.jumps.luaspec.peerouter")
@@ -20,9 +20,9 @@ do
   local function be_normal()
     local mode = api.nvim_get_mode().mode
     if mode == "v" then
-      api.nvim_feedkeys(nvimkeys("<esc>"), "n", false)
+      feedkeys("<esc>", "n")
     elseif mode == "no" then
-      api.nvim_feedkeys(nvimkeys("<esc>"), "n", false)
+      feedkeys("<esc>", "n")
     else
       error("unexpected mode " .. mode)
     end

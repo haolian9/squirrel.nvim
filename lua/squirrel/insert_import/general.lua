@@ -1,7 +1,7 @@
 local ts = vim.treesitter
 local api = vim.api
+local feedkeys = require("infra.feedkeys")
 local jelly = require("infra.jellyfish")("squirrel.import_import.general")
-local nvimkeys = require("infra.nvimkeys")
 local winsplit = require("infra.winsplit")
 
 local nuts = require("squirrel.nuts")
@@ -89,6 +89,6 @@ return function()
     winsplit("above")
     local target_win_id = api.nvim_get_current_win()
     nuts.goto_node_tail(target_win_id, anchor)
-    api.nvim_feedkeys(nvimkeys([[o<cr>]] .. prefix), "ni", false)
+    feedkeys([[o<cr>]] .. prefix, "ni")
   end
 end

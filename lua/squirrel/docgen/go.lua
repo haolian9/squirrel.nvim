@@ -6,9 +6,9 @@
 local ts = vim.treesitter
 local api = vim.api
 local buflines = require("infra.buflines")
+local feedkeys = require("infra.feedkeys")
 local jelly = require("infra.jellyfish")("squirrel.docgen.go")
 local jumplist = require("infra.jumplist")
-local nvimkeys = require("infra.nvimkeys")
 local prefer = require("infra.prefer")
 
 local nuts = require("squirrel.nuts")
@@ -57,7 +57,7 @@ local function try_field_ann(start, winid, bufnr)
   -- search `desc` in generated annotation for easier editing
   do
     api.nvim_win_set_cursor(winid, { r0 + 1, 0 })
-    api.nvim_feedkeys(nvimkeys([[V<esc>/\%V\<\zsdesc$<cr>]]), "n", false)
+    feedkeys([[V<esc>/\%V\<\zsdesc$<cr>]], "n")
   end
 end
 
