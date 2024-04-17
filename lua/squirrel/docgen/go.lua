@@ -3,15 +3,17 @@
 -- * field: Foo string `json"foo"`
 --
 
-local ts = vim.treesitter
-local api = vim.api
 local buflines = require("infra.buflines")
+local ctx = require("infra.ctx")
 local feedkeys = require("infra.feedkeys")
 local jelly = require("infra.jellyfish")("squirrel.docgen.go")
 local jumplist = require("infra.jumplist")
 local prefer = require("infra.prefer")
 
 local nuts = require("squirrel.nuts")
+
+local ts = vim.treesitter
+local api = vim.api
 
 ---@param start TSNode
 ---@return TSNode?
@@ -25,7 +27,7 @@ local function find_parent_field_decl_node(start)
 end
 
 local function resolve_line_indent(bufnr, l0)
-  local ispcs = api.nvim_buf_call(bufnr, function() return vim.fn.indent(l0 + 1) end)
+  local ispcs = ctx.buf(bufnr, function() return vim.fn.indent(l0 + 1) end)
   local sw = prefer.bo(bufnr, "shiftwidth")
   return string.rep("\t", ispcs / sw)
 end

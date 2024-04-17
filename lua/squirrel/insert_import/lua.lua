@@ -48,6 +48,7 @@ do
   local aliases = {
     ["infra.keymap.buffer"] = "bufmap",
     ["infra.keymap.global"] = "m",
+    ["infra._strfmt"] = "strfmt",
   }
 
   ---@param line string
