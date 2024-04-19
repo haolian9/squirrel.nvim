@@ -73,7 +73,7 @@ local routes = {
 return function(winid)
   local start = nuts.get_node_at_cursor(winid)
   local itype = start:type()
-  local route = routes[start:type()]
+  local route = routes[itype]
   if route then route(winid, start, itype) end
   return route ~= nil
 end
