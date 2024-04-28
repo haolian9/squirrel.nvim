@@ -8,6 +8,7 @@ local ex = require("infra.ex")
 local fn = require("infra.fn")
 local jelly = require("infra.jellyfish")("squirrel.nuts")
 local jumplist = require("infra.jumplist")
+local prefer = require("infra.prefer")
 local unsafe = require("infra.unsafe")
 
 local api = vim.api
@@ -186,6 +187,16 @@ function M.get_named_decendant(root, ...)
     if next:type() ~= itype then return jelly.debug("n=%d type.expect=%s .actual=%s", i, itype, next:type()) end
   end
   return next
+end
+
+---assume one buffer has only one tree
+---@param bufnr integer
+---@return TSNode?
+function M.get_root_node(bufnr)
+  local parser = ts.get_parser(bufnr)
+  local trees = parser:trees()
+  assert(#trees == 1)
+  return trees[1]:root()
 end
 
 return M

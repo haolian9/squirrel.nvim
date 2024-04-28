@@ -5,10 +5,10 @@ local prefer = require("infra.prefer")
 local strlib = require("infra.strlib")
 
 local puff = require("puff")
+local facts = require("squirrel.insert_import.facts")
 local nuts = require("squirrel.nuts")
 
 local api = vim.api
-local ts = vim.treesitter
 
 local find_anchor
 do
@@ -26,21 +26,16 @@ do
   ---@param bufnr integer
   ---@return TSNode?
   local function first_require(bufnr)
-    local root = assert(ts.get_parser(bufnr):trees()[1]):root()
+    local root = assert(nuts.get_root_node(bufnr))
+
     for idx in fn.range(root:named_child_count()) do
       local child = root:named_child(idx)
       if is_require_node(child) then return child end
     end
   end
 
-  ---@type TSNode
-  local origin = {}
-  function origin:start() return -1, 0 end
-  function origin:end_() return -1, 0 end
-  function origin:range() return -1, 0, -1, 0 end
-
   ---@return TSNode
-  function find_anchor(bufnr) return first_require(bufnr) or origin end
+  function find_anchor(bufnr) return first_require(bufnr) or facts.origin end
 end
 
 local resolve_require_stat
@@ -80,21 +75,18 @@ return function()
   local anchor = find_anchor(host_bufnr)
 
   puff.input({
-    prompt = "require",
-    startinsert = true,
-    bufcall = function(bufnr)
-      --NB: lsp.client.on_attach would change something to the buffer, which conflicts with puff.input
-      prefer.bo(bufnr, "filetype", "lua")
-      buflines.replace(bufnr, 0, 'require""')
-    end,
-    wincall = function(winid) api.nvim_win_set_cursor(winid, { 1, #[[require"]] }) end,
+    prompt = "import://lua",
+    startinsert = "i",
+    default = 'require""',
+    bufcall = function(bufnr) prefer.bo(bufnr, "filetype", "lua") end,
   }, function(line)
-    if line == nil or line == "" then return end
-    local require_stat = resolve_require_stat(line)
-    if require_stat == nil then return end
+    if line == nil then return end
+    if #line <= #'require""' then return end
 
-    local anchor_tail = anchor:end_() + 1
-    buflines.prepend(host_bufnr, anchor_tail, require_stat)
-    jelly.info("'%s'", require_stat)
+    local requires = resolve_require_stat(line)
+    if requires == nil then return end
+
+    buflines.append(host_bufnr, anchor:end_(), requires)
+    jelly.info("'%s'", requires)
   end)
 end
