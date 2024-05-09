@@ -49,7 +49,7 @@ do
   M.find_parent_expr = find_parent_by(is_expr_node)
   M.find_parent_assign = find_parent_by(is_assign_node)
   M.find_parent_call = find_parent_by(is_call_node)
-  M.find_parent_state = find_parent_by(is_state_node)
+  M.find_parent_stm = find_parent_by(is_state_node)
 end
 
 ---@param start TSNode
@@ -102,8 +102,8 @@ do
   M.find_prev_sibling_fn = find_sibling_by(M.find_parent_fn, "prev_sibling", is_fn_node)
   M.find_prev_tip_sibling_fn = find_sibling_by(M.find_tip, "prev_sibling", is_fn_node)
   M.find_next_tip_sibling_fn = find_sibling_by(M.find_tip, "next_sibling", is_fn_node)
-  M.find_next_sibling_state = find_sibling_by(M.find_parent_state, "next_sibling", is_state_node)
-  M.find_prev_sibling_state = find_sibling_by(M.find_parent_state, "prev_sibling", is_state_node)
+  M.find_next_sibling_stm = find_sibling_by(M.find_parent_stm, "next_sibling", is_state_node)
+  M.find_prev_sibling_stm = find_sibling_by(M.find_parent_stm, "prev_sibling", is_state_node)
 end
 
 return M

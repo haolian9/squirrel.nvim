@@ -1,3 +1,4 @@
+local nuts = require("squirrel.nuts")
 --[[
 python spec
 * additional body node
@@ -9,8 +10,6 @@ lua spec
 c spec
 * inline vs newline {
 --]]
-
-local ts = vim.treesitter
 
 ---@type squirrel.folding.TreeWalkers
 local tree_walkers = {}
@@ -124,13 +123,7 @@ return function(ft)
 
   return function(bufnr)
     ---@type TSNode
-    local root
-    do
-      local parser = ts.get_parser(bufnr)
-      local trees = parser:trees()
-      assert(#trees == 1)
-      root = trees[1]:root()
-    end
+    local root = assert(nuts.get_root_node(bufnr))
 
     ---@type squirrel.folding.LineLevel
     local line_level = {}

@@ -9,6 +9,7 @@ local feedkeys = require("infra.feedkeys")
 local jelly = require("infra.jellyfish")("squirrel.docgen.go")
 local jumplist = require("infra.jumplist")
 local prefer = require("infra.prefer")
+local wincursor = require("infra.wincursor")
 
 local nuts = require("squirrel.nuts")
 
@@ -58,7 +59,7 @@ local function try_field_ann(start, winid, bufnr)
 
   -- search `desc` in generated annotation for easier editing
   do
-    api.nvim_win_set_cursor(winid, { r0 + 1, 0 })
+    wincursor.go(winid, r0, 0)
     feedkeys([[V<esc>/\%V\<\zsdesc$<cr>]], "n")
   end
 end

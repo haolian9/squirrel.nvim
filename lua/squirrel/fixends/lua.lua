@@ -11,6 +11,7 @@ local jelly = require("infra.jellyfish")("squirrel.fixends", "info")
 local prefer = require("infra.prefer")
 local resolve_line_indents = require("infra.resolve_line_indents")
 local strlib = require("infra.strlib")
+local wincursor = require("infra.wincursor")
 
 local nuts = require("squirrel.nuts")
 
@@ -47,20 +48,21 @@ local function try_erred_block(winid, bufnr, start_node, err_node)
   if strlib.startswith(start_chars, "if") then
     fixes = { " then", indents .. string.rep(ichar, iunit), indents .. "end" }
     if nuts.get_node_end_chars(bufnr, err_node, #fixes[1]) == fixes[1] then fixes[1] = "" end
-    cursor = { start_line + 1 + 1, #fixes[2] }
+    cursor = { lnum = start_line + 1, col = #fixes[2] }
   elseif strlib.startswith(start_chars, "do") then
     fixes = { "", indents .. string.rep(ichar, iunit), indents .. "end" }
-    cursor = { start_line + 1 + 1, #fixes[2] }
+    cursor = { lnum = start_line + 1, col = #fixes[2] }
   elseif strlib.startswith(start_chars, "for") or strlib.startswith(start_chars, "while") then
     -- assert(err_node:child():type() == "for")
     fixes = { " do", indents .. string.rep(ichar, iunit), indents .. "end" }
     if nuts.get_node_end_chars(bufnr, err_node, #fixes[1]) == fixes[1] then fixes[1] = "" end
-    cursor = { start_line + 1 + 1, #fixes[2] }
+    cursor = { lnum = start_line + 1, col = #fixes[2] }
+  else
+    return jelly.debug("no available block found")
   end
 
-  if fixes == nil then return jelly.debug("no available block found") end
   api.nvim_buf_set_text(bufnr, stop_line, stop_col, stop_line, stop_col, fixes)
-  api.nvim_win_set_cursor(winid, cursor)
+  wincursor.go(winid, cursor.lnum, cursor.col)
   return true
 end
 

@@ -140,13 +140,7 @@ return function(bufnr)
   ---for latter returns without any changes
   regulator:update(bufnr)
 
-  local root
-  do
-    local langtree = ts.get_parser()
-    local trees = langtree:trees()
-    assert(#trees == 1)
-    root = trees[1]:root()
-  end
+  local root = assert(nuts.get_root_node(bufnr))
 
   local start_line, stop_line, tiers
   do
@@ -216,7 +210,7 @@ return function(bufnr)
   end
 
   do
-    local old_lines = buflines.lines(bufnr, start_line, stop_line)
+    local old_lines = buflines.iter(bufnr, start_line, stop_line)
     local no_changes = fn.iter_equals(sorted_lines, old_lines)
     if no_changes then return jelly.debug("no changes in the require section") end
   end

@@ -61,7 +61,7 @@ do
   M.objects["aa"] = M.objects["ia"]
   M.objects["ic"] = vsel_object(treewalker.find_parent_call, nuts.vsel_node)
   M.objects["ac"] = M.objects["ic"]
-  M.objects["is"] = vsel_object(treewalker.find_parent_state, nuts.vsel_node)
+  M.objects["is"] = vsel_object(treewalker.find_parent_stm, nuts.vsel_node)
   M.objects["as"] = M.objects["is"]
 end
 
@@ -87,8 +87,8 @@ do
   M.motions["[f"] = goto_object(treewalker.find_prev_sibling_fn, nodeops.goto_node_first_identifier)
   M.motions["]f"] = goto_object(treewalker.find_next_sibling_fn, nodeops.goto_node_first_identifier)
   --beginning of previous/next sibling statement
-  M.motions["[s"] = goto_object(treewalker.find_prev_sibling_state, nodeops.goto_node_first_identifier)
-  M.motions["]s"] = goto_object(treewalker.find_next_sibling_state, nodeops.goto_node_first_identifier)
+  M.motions["[s"] = goto_object(treewalker.find_prev_sibling_stm, nodeops.goto_node_first_identifier)
+  M.motions["]s"] = goto_object(treewalker.find_next_sibling_stm, nodeops.goto_node_first_identifier)
   --beginning/ending of the current function
   M.motions["<f"] = goto_object(treewalker.find_parent_fn, nodeops.goto_node_first_identifier)
   M.motions[">f"] = goto_object(treewalker.find_parent_fn, nuts.goto_node_tail)

@@ -6,6 +6,8 @@ local listlib = require("infra.listlib")
 local prefer = require("infra.prefer")
 local strlib = require("infra.strlib")
 
+local nuts = require("squirrel.nuts")
+
 local ts = vim.treesitter
 local api = vim.api
 
@@ -152,14 +154,7 @@ function M.lint(bufnr)
 
   if prefer.bo(bufnr, "filetype") ~= "fish" then return jelly.warn("not a fish script") end
 
-  local root
-  do
-    local parser = ts.get_parser(bufnr, "fish")
-    local trees = parser:trees()
-    assert(#trees == 1)
-    local tree = trees[1]
-    root = tree:root()
-  end
+  local root = assert(nuts.get_root_node(bufnr, "fish"))
 
   local digs = {}
 

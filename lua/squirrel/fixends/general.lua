@@ -1,5 +1,6 @@
 local jelly = require("infra.jellyfish")("fixend.general")
 local resolve_line_indents = require("infra.resolve_line_indents")
+local wincursor = require("infra.wincursor")
 
 local api = vim.api
 
@@ -18,13 +19,13 @@ do
   }
 
   ---@param bufnr integer
-  ---@param cursor_line integer
+  ---@param cursor_lnum integer
   ---@param cursor_col integer
   ---@return string?
-  local function get_prompt(bufnr, cursor_line, cursor_col)
+  local function get_prompt(bufnr, cursor_lnum, cursor_col)
     if cursor_col == 0 then return jelly.debug("blank line") end
     local start_col = math.max(cursor_col - multiline_pairs[#multiline_pairs][1], 0)
-    local text = api.nvim_buf_get_text(bufnr, cursor_line, start_col, cursor_line, cursor_col, {})
+    local text = api.nvim_buf_get_text(bufnr, cursor_lnum, start_col, cursor_lnum, cursor_col, {})
     jelly.info("prompt texts: %s", text)
     local prompt = text[1]
     if prompt == "" then return end
@@ -50,34 +51,32 @@ do
   ---@param bufnr integer
   ---@return boolean? @nil=false=failed
   function try_inline_pair(winid, bufnr)
-    local cursor_line, cursor_col = unpack(api.nvim_win_get_cursor(winid))
-    cursor_line = cursor_line - 1
+    local cursor = wincursor.position(winid)
 
     local right
     do
-      local prompt = get_prompt(bufnr, cursor_line, cursor_col)
+      local prompt = get_prompt(bufnr, cursor.lnum, cursor.col)
       if prompt == nil then return jelly.debug("no prompt") end
 
       right = find_right(inline_pairs, prompt)
       if right == nil then return jelly.debug("no available pair found") end
 
-      local follows = api.nvim_buf_get_text(bufnr, cursor_line, cursor_col, cursor_line, cursor_col + #right, {})[1]
+      local follows = api.nvim_buf_get_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col + #right, {})[1]
       if follows == right then return jelly.debug("no need to add right side") end
     end
 
-    api.nvim_buf_set_text(bufnr, cursor_line, cursor_col, cursor_line, cursor_col, { right })
+    api.nvim_buf_set_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col, { right })
   end
 
   ---@param winid integer
   ---@param bufnr integer
   ---@return boolean? @nil=false=failed
   function try_multiline_pair(winid, bufnr)
-    local cursor_line, cursor_col = unpack(api.nvim_win_get_cursor(winid))
-    cursor_line = cursor_line - 1
+    local cursor = wincursor.position(winid)
 
     local right
     do
-      local prompt = get_prompt(bufnr, cursor_line, cursor_col)
+      local prompt = get_prompt(bufnr, cursor.lnum, cursor.col)
       if prompt == nil then return jelly.debug("no prompt") end
       right = find_right(multiline_pairs, prompt)
       if right == nil then return jelly.debug("no available pair found") end
@@ -85,12 +84,12 @@ do
 
     local fixes
     do
-      local indents, ichar, iunit = resolve_line_indents(bufnr, cursor_line)
+      local indents, ichar, iunit = resolve_line_indents(bufnr, cursor.lnum)
       fixes = { "", indents .. string.rep(ichar, iunit), indents .. right }
     end
 
-    api.nvim_buf_set_text(bufnr, cursor_line, cursor_col, cursor_line, cursor_col, fixes)
-    api.nvim_win_set_cursor(winid, { cursor_line + 1 + 1, #fixes[2] })
+    api.nvim_buf_set_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col, fixes)
+    wincursor.go(winid, cursor.lnum + #fixes - 1, string.len(fixes[#fixes]))
   end
 end
 

@@ -44,29 +44,31 @@ do
     ["infra.keymap.buffer"] = "bufmap",
     ["infra.keymap.global"] = "m",
     ["infra._strfmt"] = "strfmt",
+    ["string.buffer"] = "ropes",
   }
 
-  ---@param line string
+  ---@param path string
   ---@return string?
-  local function resolve_as(line)
-    local mod = string.match(line, '^require"(.+)"')
-    if mod == nil then return end
+  local function try_alias(path) return aliases[path] end
 
-    local alias = aliases[mod]
-    if alias ~= nil then return alias end
-
-    local start = strlib.rfind(mod, ".")
-    if start == nil then return mod end
-
-    return string.sub(mod, start + 1)
+  ---@param path string
+  ---@return string
+  local function try_final(path)
+    local dot_at = strlib.rfind(path, ".")
+    if dot_at == nil then return path end
+    return string.sub(path, dot_at + 1)
   end
 
   ---@param line string
   ---@return string?
   function resolve_require_stat(line)
-    local as = resolve_as(line)
-    if as == nil then return end
-    return string.format("local %s = %s", as, line)
+    local path = string.match(line, '^require"([^"]+)"?$')
+    if path == nil then return jelly.warn('no path found in "%s"', line) end
+
+    local as = try_alias(path) or try_final(path)
+    assert(as ~= nil)
+
+    return string.format('local %s = require("%s")', as, path)
   end
 end
 
@@ -76,12 +78,12 @@ return function()
 
   puff.input({
     prompt = "import://lua",
-    startinsert = "i",
-    default = 'require""',
+    startinsert = "a",
+    default = 'require"',
     bufcall = function(bufnr) prefer.bo(bufnr, "filetype", "lua") end,
   }, function(line)
     if line == nil then return end
-    if #line <= #'require""' then return end
+    if #line <= #'require"' then return end
 
     local requires = resolve_require_stat(line)
     if requires == nil then return end

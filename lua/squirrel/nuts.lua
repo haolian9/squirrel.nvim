@@ -8,8 +8,8 @@ local ex = require("infra.ex")
 local fn = require("infra.fn")
 local jelly = require("infra.jellyfish")("squirrel.nuts")
 local jumplist = require("infra.jumplist")
-local prefer = require("infra.prefer")
 local unsafe = require("infra.unsafe")
+local wincursor = require("infra.wincursor")
 
 local api = vim.api
 local ts = vim.treesitter
@@ -22,8 +22,7 @@ function M.get_node_at_cursor(winid)
 
   local lnum, col
   do
-    lnum, col = unpack(api.nvim_win_get_cursor(winid))
-    lnum = lnum - 1
+    lnum, col = wincursor.lc(winid)
     local llen = assert(unsafe.linelen(bufnr, lnum))
     assert(col <= llen, "unreachable: col can not gte llen")
     if col == llen then col = math.max(col - 1, 0) end
@@ -42,7 +41,7 @@ function M.goto_node_head(winid, node)
   jumplist.push_here()
 
   local lnum, col = node:start()
-  api.nvim_win_set_cursor(winid, { lnum + 1, col })
+  wincursor.go(winid, lnum, col)
 end
 
 ---@type squirrel.nuts.goto_node
@@ -50,7 +49,7 @@ function M.goto_node_tail(winid, node)
   jumplist.push_here()
 
   local lnum, col = node:end_()
-  api.nvim_win_set_cursor(winid, { lnum + 1, col - 1 })
+  wincursor.go(winid, lnum, col - 1)
 end
 
 --should only to be used for selecting objects
@@ -191,10 +190,11 @@ end
 
 ---assume one buffer has only one tree
 ---@param bufnr integer
+---@param ft? string
 ---@return TSNode?
-function M.get_root_node(bufnr)
-  local parser = ts.get_parser(bufnr)
-  local trees = parser:trees()
+function M.get_root_node(bufnr, ft)
+  local langtree = ts.get_parser(bufnr, ft)
+  local trees = langtree:trees()
   assert(#trees == 1)
   return trees[1]:root()
 end
