@@ -26,8 +26,7 @@ return function()
   end
 
   local new_win_id
-  -- setup new win & buf
-  do
+  do --setup new win & buf
     winsplit("left")
     new_win_id = api.nvim_get_current_win()
     api.nvim_win_set_width(new_win_id, 20)
@@ -37,7 +36,7 @@ return function()
     api.nvim_win_set_buf(new_win_id, new_bufnr)
   end
 
-  -- scrollbind
+  --scrollbind
   api.nvim_win_set_cursor(new_win_id, api.nvim_win_get_cursor(winid))
   prefer.wo(winid, "scrollbind", true)
   prefer.wo(new_win_id, "scrollbind", true)

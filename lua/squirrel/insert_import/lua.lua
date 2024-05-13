@@ -78,8 +78,8 @@ return function()
 
   puff.input({
     prompt = "import://lua",
-    startinsert = "a",
     default = 'require"',
+    startinsert = "a",
     bufcall = function(bufnr) prefer.bo(bufnr, "filetype", "lua") end,
   }, function(line)
     if line == nil then return end
