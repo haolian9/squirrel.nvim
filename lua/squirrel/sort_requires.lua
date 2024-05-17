@@ -9,6 +9,8 @@
 ---  * `local x, y = require'x', require'y'`
 ---  * `local x = require'x' ---x`
 ---  * `     local x = require'x'     `
+---  * `local x = require('x' .. 'y')`
+---  * `local x = require(string.format('x.%s', 'y'))`
 ---* sort in alphabet order, based on the 'tier' of each require statement
 ---
 ---require tiers:
