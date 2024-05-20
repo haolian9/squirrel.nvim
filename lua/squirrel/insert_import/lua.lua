@@ -1,11 +1,11 @@
 local buflines = require("infra.buflines")
 local fn = require("infra.fn")
 local jelly = require("infra.jellyfish")("squirrel.insert_import.lua")
-local prefer = require("infra.prefer")
 local strlib = require("infra.strlib")
 
 local puff = require("puff")
 local facts = require("squirrel.insert_import.facts")
+local wait_langclient_ready = require("squirrel.insert_import.wait_langclient_ready")
 local nuts = require("squirrel.nuts")
 
 local api = vim.api
@@ -80,7 +80,7 @@ return function()
     prompt = "import://lua",
     default = 'require"',
     startinsert = "a",
-    bufcall = function(bufnr) prefer.bo(bufnr, "filetype", "lua") end,
+    bufcall = function(bufnr) wait_langclient_ready(bufnr, "lua") end,
   }, function(line)
     if line == nil then return end
     if #line <= #'require"' then return end
