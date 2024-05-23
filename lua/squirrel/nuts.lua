@@ -5,7 +5,7 @@
 local M = {}
 
 local ex = require("infra.ex")
-local fn = require("infra.fn")
+local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.nuts")
 local jumplist = require("infra.jumplist")
 local unsafe = require("infra.unsafe")
@@ -176,7 +176,7 @@ end
 function M.get_named_decendant(root, ...)
   local args = { ... }
   assert(#args % 2 == 0)
-  local arg_iter = fn.iter(args)
+  local arg_iter = itertools.iter(args)
   ---@type TSNode
   local next = root
   for i in arg_iter do

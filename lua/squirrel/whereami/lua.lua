@@ -1,5 +1,5 @@
 local Ephemeral = require("infra.Ephemeral")
-local fn = require("infra.fn")
+local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.whereami")
 local prefer = require("infra.prefer")
 local rifts = require("infra.rifts")
@@ -11,7 +11,7 @@ local api = vim.api
 
 local collect_stops
 do
-  local types = fn.toset({ "function_declaration", "function_definition" })
+  local types = itertools.toset({ "function_declaration", "function_definition" })
   ---collect 'stop's from inner to outer
   ---@param start_node TSNode
   ---@return TSNode[]

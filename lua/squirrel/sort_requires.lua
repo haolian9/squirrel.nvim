@@ -21,7 +21,7 @@
 ---
 
 local buflines = require("infra.buflines")
-local fn = require("infra.fn")
+local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.sort_requires")
 local prefer = require("infra.prefer")
 local Regulator = require("infra.Regulator")
@@ -91,9 +91,9 @@ end
 local sorted_tiers
 do
   local preset_tiers = {
-    fn.toset({ "ffi" }),
-    fn.toset({ "vim" }),
-    fn.toset({ "infra", "cthulhu" }),
+    itertools.toset({ "ffi" }),
+    itertools.toset({ "vim" }),
+    itertools.toset({ "infra", "cthulhu" }),
   }
 
   ---@param a Require
@@ -111,7 +111,7 @@ do
       end
       for _, el in ipairs(orig_requires) do
         local tier_ix
-        local prefix = fn.split_iter(el.name, ".")()
+        local prefix = strlib.iter_splits(el.name, ".")()
         for i, presets in ipairs(preset_tiers) do
           if presets[prefix] then
             tier_ix = i
@@ -150,7 +150,7 @@ return function(bufnr)
     local requires = {}
     do
       local section_started = false
-      for i in fn.range(root:named_child_count()) do
+      for i in itertools.range(root:named_child_count()) do
         local node = assert(root:named_child(i), i)
         local require_name = find_require_mod_name(bufnr, node)
         if require_name then
@@ -200,7 +200,7 @@ return function(bufnr)
 
   local sorted_lines = {}
   do
-    for requires in fn.filter(function(requires) return #requires > 0 end, tiers) do
+    for requires in itertools.filter(function(requires) return #requires > 0 end, tiers) do
       for _, el in ipairs(requires) do
         table.insert(sorted_lines, ts.get_node_text(el.node, bufnr))
       end
@@ -213,7 +213,7 @@ return function(bufnr)
 
   do
     local old_lines = buflines.iter(bufnr, start_line, stop_line)
-    local no_changes = fn.iter_equals(sorted_lines, old_lines)
+    local no_changes = itertools.equals(sorted_lines, old_lines)
     if no_changes then return jelly.debug("no changes in the require section") end
   end
 

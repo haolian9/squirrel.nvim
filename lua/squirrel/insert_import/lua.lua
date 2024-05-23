@@ -1,5 +1,5 @@
 local buflines = require("infra.buflines")
-local fn = require("infra.fn")
+local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.insert_import.lua")
 local strlib = require("infra.strlib")
 
@@ -28,7 +28,7 @@ do
   local function first_require(bufnr)
     local root = assert(nuts.get_root_node(bufnr))
 
-    for idx in fn.range(root:named_child_count()) do
+    for idx in itertools.range(root:named_child_count()) do
       local child = root:named_child(idx)
       if is_require_node(child) then return child end
     end

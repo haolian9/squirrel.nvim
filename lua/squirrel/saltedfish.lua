@@ -1,6 +1,6 @@
 local M = {}
 
-local fn = require("infra.fn")
+local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.saltedfish", "info")
 local listlib = require("infra.listlib")
 local prefer = require("infra.prefer")
@@ -67,7 +67,7 @@ do
   local function collect_args(bufnr, set_node)
     local args = {}
 
-    local iter = fn.iter(set_node:field("argument"))
+    local iter = itertools.iter(set_node:field("argument"))
 
     for arg in iter do
       local text = get_node_text(bufnr, arg)
@@ -117,7 +117,7 @@ do
   ---@param set_node TSNode
   ---@return TSNode?
   local function get_arg0(bufnr, set_node)
-    local iter = fn.iter(set_node:field("argument"))
+    local iter = itertools.iter(set_node:field("argument"))
 
     for arg in iter do
       local text = get_node_text(bufnr, arg)

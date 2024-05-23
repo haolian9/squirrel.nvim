@@ -1,4 +1,4 @@
-local fn = require("infra.fn")
+local itertools = require("infra.itertools")
 
 local nuts = require("squirrel.nuts")
 
@@ -6,7 +6,7 @@ local nuts = require("squirrel.nuts")
 
 local passthrough
 do
-  local types = fn.toset({ "comment" })
+  local types = itertools.toset({ "comment" })
   local function inner(node) return node end
 
   ---@param ntype string
@@ -17,7 +17,7 @@ do
 end
 
 local seek_upward = (function()
-  local stops = fn.toset({
+  local stops = itertools.toset({
     "function_call",
     "table_constructor",
     "block",

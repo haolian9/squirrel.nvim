@@ -5,7 +5,7 @@
 -- * annotations of function signature
 --
 
-local fn = require("infra.fn")
+local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.docgen", "INFO")
 
 local parrot = require("parrot")
@@ -81,7 +81,7 @@ return function()
 
   local anns = {}
   do
-    for i in fn.range(params_node:named_child_count()) do
+    for i in itertools.range(params_node:named_child_count()) do
       local node = params_node:named_child(i)
       local text = ts.get_node_text(node, bufnr)
       table.insert(anns, string.format("---@param %s $1", text))

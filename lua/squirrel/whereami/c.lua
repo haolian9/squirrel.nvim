@@ -1,6 +1,5 @@
 local Ephemeral = require("infra.Ephemeral")
-local fn = require("infra.fn")
-local prefer = require("infra.prefer")
+local itertools = require("infra.itertools")
 local rifts = require("infra.rifts")
 
 local nuts = require("squirrel.nuts")
@@ -12,7 +11,7 @@ local api = vim.api
 
 local collect_stops
 do
-  local types = fn.toset({ "function_definition", "declaration" })
+  local types = itertools.toset({ "function_definition", "declaration" })
 
   ---@param start_node TSNode
   ---@return TSNode[]
