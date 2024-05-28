@@ -46,6 +46,7 @@ return function()
   puff.input({
     prompt = "require",
     default = 'import ""',
+    icon = "🚀",
     startinsert = "i",
     bufcall = function(bufnr) wait_langclient_ready(bufnr, "go") end,
   }, function(line)

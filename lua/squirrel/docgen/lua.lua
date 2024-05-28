@@ -93,5 +93,5 @@ return function()
   end
 
   local insert_lnum, insert_col = fn_node:range()
-  parrot.expand_external_chirps(anns, winid, insert_lnum, insert_col, false)
+  parrot.expand_external_chirp(anns, winid, { lnum = insert_lnum, col = insert_col, col_end = insert_col })
 end

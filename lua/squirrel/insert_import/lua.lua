@@ -79,6 +79,7 @@ return function()
   puff.input({
     prompt = "import://lua",
     default = 'require"',
+    icon = "🚀",
     startinsert = "a",
     bufcall = function(bufnr) wait_langclient_ready(bufnr, "lua") end,
   }, function(line)

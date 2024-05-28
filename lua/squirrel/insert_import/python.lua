@@ -46,6 +46,7 @@ return function()
   puff.input({
     prompt = "import://python",
     default = "from ",
+    icon = "🚀",
     startinsert = "a",
     bufcall = function(bufnr) wait_langclient_ready(bufnr, "python") end,
   }, function(line)
