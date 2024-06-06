@@ -7,6 +7,7 @@
 
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.docgen", "INFO")
+local resolve_line_indents = require("infra.resolve_line_indents")
 
 local parrot = require("parrot")
 local nuts = require("squirrel.nuts")
@@ -88,10 +89,14 @@ return function()
     end
     local return_type = resolve_return_type(fn_node)
     if return_type then table.insert(anns, string.format("---@return " .. return_type)) end
-    if #anns == 0 then return end
+    if #anns == 0 then return jelly.info("no param nor return") end
     table.insert(anns, "")
   end
 
-  local insert_lnum, insert_col = fn_node:range()
-  parrot.expand_external_chirp(anns, winid, { lnum = insert_lnum, col = insert_col, col_end = insert_col })
+  do
+    local lnum = fn_node:range()
+    local indents = resolve_line_indents(bufnr, lnum)
+    local col = #indents
+    parrot.expand_external_chirp(anns, winid, { lnum = lnum, col = col, col_end = col })
+  end
 end
