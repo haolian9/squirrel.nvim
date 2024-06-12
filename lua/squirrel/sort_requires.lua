@@ -177,20 +177,14 @@ return function(bufnr)
         if p ~= nil then
           local _, _, p_stop_line = p:range()
           local i_start_line = i:range()
-          if p_stop_line == i_start_line then
-            jelly.err("%d line has a non-require node and a require node", i_start_line + 1)
-            error("multiple nodes in same line")
-          end
+          if p_stop_line == i_start_line then return jelly.fatal("unreachable", "%d line has a non-require node and a require node", i_start_line + 1) end
         end
 
         local n = i:next_sibling()
         if n ~= nil then
           local n_start_line = n:range()
           local _, _, p_stop_line = i:range()
-          if p_stop_line == n_start_line then
-            jelly.err("%d line has a require node and a non-require node", p_stop_line + 1)
-            error("multiple nodes in same line")
-          end
+          if p_stop_line == n_start_line then return jelly.fatal("unreachable", "%d line has a require node and a non-require node", p_stop_line + 1) end
         end
       end
     end

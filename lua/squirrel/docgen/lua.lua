@@ -35,8 +35,7 @@ local function find_params_node(fn_node)
   elseif fn_node:type() == "function_definition" then
     return assert(fn_node:named_child(0))
   else
-    jelly.err("unable to find params child node: %s", fn_node:sexpr())
-    error("unreachable")
+    return jelly.fatal("unreachable", "unable to find params child node: %s", fn_node:sexpr())
   end
 end
 
