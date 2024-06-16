@@ -1,15 +1,14 @@
 local buflines = require("infra.buflines")
 local Ephemeral = require("infra.Ephemeral")
+local ni = require("infra.ni")
 local prefer = require("infra.prefer")
 local winsplit = require("infra.winsplit")
 
 local exprs = require("squirrel.folding.exprs")
 
-local api = vim.api
-
 return function()
-  local winid = api.nvim_get_current_win()
-  local bufnr = api.nvim_win_get_buf(winid)
+  local winid = ni.get_current_win()
+  local bufnr = ni.win_get_buf(winid)
 
   local new_bufnr
   do
@@ -28,16 +27,16 @@ return function()
   local new_win_id
   do --setup new win & buf
     winsplit("left")
-    new_win_id = api.nvim_get_current_win()
-    api.nvim_win_set_width(new_win_id, 20)
+    new_win_id = ni.get_current_win()
+    ni.win_set_width(new_win_id, 20)
     local wo = prefer.win(new_win_id)
     wo.number = true
     wo.relativenumber = false
-    api.nvim_win_set_buf(new_win_id, new_bufnr)
+    ni.win_set_buf(new_win_id, new_bufnr)
   end
 
   --scrollbind
-  api.nvim_win_set_cursor(new_win_id, api.nvim_win_get_cursor(winid))
+  ni.win_set_cursor(new_win_id, ni.win_get_cursor(winid))
   prefer.wo(winid, "scrollbind", true)
   prefer.wo(new_win_id, "scrollbind", true)
 end

@@ -1,8 +1,7 @@
 local jelly = require("infra.jellyfish")("fixend.general")
+local ni = require("infra.ni")
 local resolve_line_indents = require("infra.resolve_line_indents")
 local wincursor = require("infra.wincursor")
-
-local api = vim.api
 
 local try_inline_pair, try_multiline_pair
 do
@@ -25,7 +24,7 @@ do
   local function get_prompt(bufnr, cursor_lnum, cursor_col)
     if cursor_col == 0 then return jelly.debug("blank line") end
     local start_col = math.max(cursor_col - multiline_pairs[#multiline_pairs][1], 0)
-    local text = api.nvim_buf_get_text(bufnr, cursor_lnum, start_col, cursor_lnum, cursor_col, {})
+    local text = ni.buf_get_text(bufnr, cursor_lnum, start_col, cursor_lnum, cursor_col, {})
     jelly.info("prompt texts: %s", text)
     local prompt = text[1]
     if prompt == "" then return end
@@ -61,11 +60,11 @@ do
       right = find_right(inline_pairs, prompt)
       if right == nil then return jelly.debug("no available pair found") end
 
-      local follows = api.nvim_buf_get_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col + #right, {})[1]
+      local follows = ni.buf_get_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col + #right, {})[1]
       if follows == right then return jelly.debug("no need to add right side") end
     end
 
-    api.nvim_buf_set_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col, { right })
+    ni.buf_set_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col, { right })
   end
 
   ---@param winid integer
@@ -88,7 +87,7 @@ do
       fixes = { "", indents .. string.rep(ichar, iunit), indents .. right }
     end
 
-    api.nvim_buf_set_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col, fixes)
+    ni.buf_set_text(bufnr, cursor.lnum, cursor.col, cursor.lnum, cursor.col, fixes)
     wincursor.go(winid, cursor.lnum + #fixes - 1, string.len(fixes[#fixes]))
   end
 end
@@ -96,7 +95,7 @@ end
 ---@param winid integer
 ---@return boolean? @nil=false=failed
 return function(winid)
-  local bufnr = api.nvim_win_get_buf(winid)
+  local bufnr = ni.win_get_buf(winid)
   if try_inline_pair(winid, bufnr) then return end
   if try_multiline_pair(winid, bufnr) then return end
 end

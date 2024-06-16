@@ -3,13 +3,12 @@ local M = {}
 local ex = require("infra.ex")
 local feedkeys = require("infra.feedkeys")
 local jelly = require("infra.jellyfish")("squirrel.jumps.luaspec")
+local ni = require("infra.ni")
 
 local nodeops = require("squirrel.jumps.luaspec.nodeops")
 local peerouter = require("squirrel.jumps.luaspec.peerouter")
 local treewalker = require("squirrel.jumps.luaspec.treewalker")
 local nuts = require("squirrel.nuts")
-
-local api = vim.api
 
 M.objects = {}
 M.motions = {}
@@ -18,7 +17,7 @@ M.goto_peer = nil
 do
   -- expected use in operator-pending, visual mode only
   local function be_normal()
-    local mode = api.nvim_get_mode().mode
+    local mode = ni.get_mode().mode
     if mode == "v" then
       feedkeys("<esc>", "n")
     elseif mode == "no" then
@@ -34,7 +33,7 @@ do
   local function vsel_object(finder, vseler)
     ---@param winid number?
     return function(winid)
-      winid = winid or api.nvim_get_current_win()
+      winid = winid or ni.get_current_win()
       local target = finder(nuts.get_node_at_cursor(winid))
       if target == nil then
         jelly.info("no object available")
@@ -71,7 +70,7 @@ do
   ---@return fun(winid: number?)
   local function goto_object(finder, go_to)
     return function(winid)
-      winid = winid or api.nvim_get_current_win()
+      winid = winid or ni.get_current_win()
       for _ = 1, vim.v.count1 do
         local target = finder(nuts.get_node_at_cursor(winid))
         if target == nil then return jelly.info("no objects available") end
@@ -95,7 +94,7 @@ do
 end
 
 function M.goto_peer(winid)
-  winid = winid or api.nvim_get_current_win()
+  winid = winid or ni.get_current_win()
   if not peerouter(winid) then
     -- fallback to native %
     ex.eval("normal! %")

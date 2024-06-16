@@ -1,13 +1,12 @@
 local M = {}
 
 local bufmap = require("infra.keymap.buffer")
+local ni = require("infra.ni")
 local prefer = require("infra.prefer")
 
-local api = vim.api
-
 function M.attach(ft)
-  local winid = api.nvim_get_current_win()
-  local bufnr = api.nvim_win_get_buf(winid)
+  local winid = ni.get_current_win()
+  local bufnr = ni.win_get_buf(winid)
 
   local spec
   do

@@ -8,17 +8,16 @@ local ex = require("infra.ex")
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.nuts")
 local jumplist = require("infra.jumplist")
+local ni = require("infra.ni")
 local unsafe = require("infra.unsafe")
 local wincursor = require("infra.wincursor")
-
-local api = vim.api
 local ts = vim.treesitter
 
 ---NB: when the cursor lays at the end of line, it will advance one char
 ---@param winid number
 ---@return TSNode
 function M.get_node_at_cursor(winid)
-  local bufnr = api.nvim_win_get_buf(winid)
+  local bufnr = ni.win_get_buf(winid)
 
   local lnum, col
   do
@@ -57,7 +56,7 @@ end
 ---@param node TSNode
 ---@return boolean
 function M.vsel_node(winid, node)
-  local mode = api.nvim_get_mode().mode
+  local mode = ni.get_mode().mode
   if mode == "no" or mode == "n" then
     -- operator-pending mode
     M.goto_node_head(winid, node)
@@ -104,7 +103,7 @@ do
       stop_line = stop_line - 1
     end
 
-    return api.nvim_buf_get_text(bufnr, start_line, start_col, stop_line, stop_col, {})
+    return ni.buf_get_text(bufnr, start_line, start_col, stop_line, stop_col, {})
   end
 
   ---get the first char from the first line of a node
@@ -113,7 +112,7 @@ do
   ---@return string
   function M.get_node_first_char(bufnr, node)
     local start_line, start_col = node:start()
-    local text = api.nvim_buf_get_text(bufnr, start_line, start_col, start_line, start_col + 1, {})
+    local text = ni.buf_get_text(bufnr, start_line, start_col, start_line, start_col + 1, {})
     assert(#text == 1)
     local char = text[1]
     assert(#char == 1)
@@ -126,7 +125,7 @@ do
   ---@return string
   function M.get_node_last_char(bufnr, node)
     local stop_line, stop_col = node:end_()
-    local text = api.nvim_buf_get_text(bufnr, stop_line, stop_col - 1, stop_line, stop_col, {})
+    local text = ni.buf_get_text(bufnr, stop_line, stop_col - 1, stop_line, stop_col, {})
     assert(#text == 1)
     local char = text[1]
     assert(#char == 1)
@@ -146,7 +145,7 @@ do
     else
       corrected_stop_col = start_col + n
     end
-    local text = api.nvim_buf_get_text(bufnr, start_line, start_col, start_line, corrected_stop_col, {})
+    local text = ni.buf_get_text(bufnr, start_line, start_col, start_line, corrected_stop_col, {})
     assert(#text == 1)
     return text[1]
   end
@@ -164,7 +163,7 @@ do
     else
       corrected_start_col = math.max(stop_col - n, 0)
     end
-    local text = api.nvim_buf_get_text(bufnr, stop_line, corrected_start_col, stop_line, stop_col, {})
+    local text = ni.buf_get_text(bufnr, stop_line, corrected_start_col, stop_line, stop_col, {})
     assert(#text == 1)
     return text[1]
   end

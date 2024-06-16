@@ -4,11 +4,10 @@
 
 local M = {}
 
-local api = vim.api
-
 local ctx = require("infra.ctx")
 local jelly = require("infra.jellyfish")("squirrel.incsel")
 local bufmap = require("infra.keymap.buffer")
+local ni = require("infra.ni")
 
 local startpoints = require("squirrel.incsel.startpoints")
 local nuts = require("squirrel.nuts")
@@ -74,7 +73,7 @@ do
 
     do -- prepare state
       self.winid = winid
-      self.bufnr = api.nvim_win_get_buf(self.winid)
+      self.bufnr = ni.win_get_buf(self.winid)
       self.started = true
       self.path = {}
       table.insert(self.path, startpoint_resolver(self.winid))
@@ -106,7 +105,7 @@ do
     --it's possible to call state:init() multiple times but the buffer has no changes even once
     if not self.attached then
       self.attached = true
-      assert(api.nvim_buf_attach(self.bufnr, false, {
+      assert(ni.buf_attach(self.bufnr, false, {
         on_lines = function()
           if self.started then self:deinit() end
           assert(self.attached)
@@ -120,14 +119,14 @@ end
 
 function M.n()
   local pointer = startpoints.n()
-  local winid = api.nvim_get_current_win()
+  local winid = ni.get_current_win()
 
   if not state.started then
     state:init(winid, pointer)
     return
   end
 
-  if api.nvim_win_get_buf(winid) ~= state.bufnr then
+  if ni.win_get_buf(winid) ~= state.bufnr then
     state:deinit()
     state:init(winid, pointer)
     return
@@ -135,7 +134,7 @@ function M.n()
 end
 
 function M.m(filetype)
-  local winid = api.nvim_get_current_win()
+  local winid = ni.get_current_win()
   local pointer = startpoints.m(filetype)
 
   if not state.started then
@@ -143,7 +142,7 @@ function M.m(filetype)
     return
   end
 
-  if api.nvim_win_get_buf(winid) ~= state.bufnr then
+  if ni.win_get_buf(winid) ~= state.bufnr then
     state:deinit()
     state:init(winid, pointer)
     return

@@ -23,13 +23,13 @@
 local buflines = require("infra.buflines")
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.sort_requires")
+local ni = require("infra.ni")
 local prefer = require("infra.prefer")
 local Regulator = require("infra.Regulator")
 local strlib = require("infra.strlib")
 
 local nuts = require("squirrel.nuts")
 
-local api = vim.api
 local ts = vim.treesitter
 
 ---@alias Require {name: string, node: TSNode}
@@ -134,7 +134,7 @@ end
 local regulator = Regulator(1024)
 
 return function(bufnr)
-  if bufnr == nil or bufnr == 0 then bufnr = api.nvim_get_current_buf() end
+  if bufnr == nil or bufnr == 0 then bufnr = ni.get_current_buf() end
   if prefer.bo(bufnr, "filetype") ~= "lua" then return jelly.err("only support lua buffer") end
 
   if regulator:throttled(bufnr) then return jelly.debug("no change") end

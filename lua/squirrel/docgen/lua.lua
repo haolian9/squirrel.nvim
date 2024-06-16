@@ -7,13 +7,13 @@
 
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.docgen", "INFO")
+local ni = require("infra.ni")
 local resolve_line_indents = require("infra.resolve_line_indents")
 
 local parrot = require("parrot")
 local nuts = require("squirrel.nuts")
 
 local ts = vim.treesitter
-local api = vim.api
 
 local function find_fn_node_around_cursor(winid)
   local start = nuts.get_node_at_cursor(winid)
@@ -72,8 +72,8 @@ local function resolve_return_type(fn_node)
 end
 
 return function()
-  local winid = api.nvim_get_current_win()
-  local bufnr = api.nvim_win_get_buf(winid)
+  local winid = ni.get_current_win()
+  local bufnr = ni.win_get_buf(winid)
 
   local fn_node = find_fn_node_around_cursor(winid)
   if fn_node == nil then return end

@@ -1,6 +1,6 @@
-local api = vim.api
 local buflines = require("infra.buflines")
 local jelly = require("infra.jellyfish")("squirrel.import_import.go")
+local ni = require("infra.ni")
 
 local puff = require("puff")
 local facts = require("squirrel.insert_import.facts")
@@ -40,7 +40,7 @@ do
 end
 
 return function()
-  local host_bufnr = api.nvim_get_current_buf()
+  local host_bufnr = ni.get_current_buf()
   local anchor = find_anchor(host_bufnr)
 
   puff.input({

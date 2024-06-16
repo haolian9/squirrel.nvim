@@ -1,11 +1,10 @@
 local Ephemeral = require("infra.Ephemeral")
 local itertools = require("infra.itertools")
+local ni = require("infra.ni")
 local rifts = require("infra.rifts")
 
 local nuts = require("squirrel.nuts")
 local facts = require("squirrel.whereami.facts")
-
-local api = vim.api
 
 -- function_definition -> declarator: function_declarator -> declarator: identifier
 
@@ -47,7 +46,7 @@ local function resolve_stop_name(bufnr, node)
 end
 
 local function resolve_route(winid)
-  local bufnr = api.nvim_win_get_buf(winid)
+  local bufnr = ni.win_get_buf(winid)
 
   local stops = { "" }
   for _, node in ipairs(collect_stops(nuts.get_node_at_cursor(winid))) do
@@ -61,22 +60,22 @@ local function resolve_route(winid)
 end
 
 do -- main
-  local winid = api.nvim_get_current_win()
+  local winid = ni.get_current_win()
   print("whereami", resolve_route(winid))
 end
 
 return function()
-  local route = resolve_route(api.nvim_get_current_win())
+  local route = resolve_route(ni.get_current_win())
   if route == nil then return end
 
   local bufnr = Ephemeral(nil, { route })
 
   local winopts = { relative = "cursor", row = -1, col = 0, width = #route, height = 1 }
   local winid = rifts.open.win(bufnr, false, winopts)
-  api.nvim_win_set_hl_ns(winid, facts.floatwin_ns)
+  ni.win_set_hl_ns(winid, facts.floatwin_ns)
 
   vim.defer_fn(function()
-    if not api.nvim_win_is_valid(winid) then return end
-    api.nvim_win_close(winid, false)
+    if not ni.win_is_valid(winid) then return end
+    ni.win_close(winid, false)
   end, 1000 * 3)
 end

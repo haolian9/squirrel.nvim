@@ -1,14 +1,13 @@
 local buflines = require("infra.buflines")
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.insert_import.lua")
+local ni = require("infra.ni")
 local strlib = require("infra.strlib")
 
 local puff = require("puff")
 local facts = require("squirrel.insert_import.facts")
 local wait_langclient_ready = require("squirrel.insert_import.wait_langclient_ready")
 local nuts = require("squirrel.nuts")
-
-local api = vim.api
 
 local find_anchor
 do
@@ -73,7 +72,7 @@ do
 end
 
 return function()
-  local host_bufnr = api.nvim_get_current_buf()
+  local host_bufnr = ni.get_current_buf()
   local anchor = find_anchor(host_bufnr)
 
   puff.input({

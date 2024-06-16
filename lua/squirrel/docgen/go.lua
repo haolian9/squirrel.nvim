@@ -8,13 +8,13 @@ local ctx = require("infra.ctx")
 local feedkeys = require("infra.feedkeys")
 local jelly = require("infra.jellyfish")("squirrel.docgen.go")
 local jumplist = require("infra.jumplist")
+local ni = require("infra.ni")
 local prefer = require("infra.prefer")
 local wincursor = require("infra.wincursor")
 
 local nuts = require("squirrel.nuts")
 
 local ts = vim.treesitter
-local api = vim.api
 
 ---@param start TSNode
 ---@return TSNode?
@@ -68,8 +68,8 @@ end
 local tries = { try_field_ann }
 
 return function()
-  local winid = api.nvim_get_current_win()
-  local bufnr = api.nvim_win_get_buf(winid)
+  local winid = ni.get_current_win()
+  local bufnr = ni.win_get_buf(winid)
   local start = nuts.get_node_at_cursor(winid)
 
   for _, try in ipairs(tries) do

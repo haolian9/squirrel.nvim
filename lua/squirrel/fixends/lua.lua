@@ -8,14 +8,13 @@
 --* [x] for..do   -> for..do | end
 
 local jelly = require("infra.jellyfish")("squirrel.fixends", "info")
+local ni = require("infra.ni")
 local prefer = require("infra.prefer")
 local resolve_line_indents = require("infra.resolve_line_indents")
 local strlib = require("infra.strlib")
 local wincursor = require("infra.wincursor")
 
 local nuts = require("squirrel.nuts")
-
-local api = vim.api
 
 ---by search ascendingly
 ---@param start TSNode
@@ -61,7 +60,7 @@ local function try_erred_block(winid, bufnr, start_node, err_node)
     return jelly.debug("no available block found")
   end
 
-  api.nvim_buf_set_text(bufnr, stop_line, stop_col, stop_line, stop_col, fixes)
+  ni.buf_set_text(bufnr, stop_line, stop_col, stop_line, stop_col, fixes)
   wincursor.go(winid, cursor.lnum, cursor.col)
   return true
 end
@@ -69,7 +68,7 @@ end
 ---@param winid integer
 ---@return boolean? @nil=false=failed
 return function(winid)
-  local bufnr = api.nvim_win_get_buf(winid)
+  local bufnr = ni.win_get_buf(winid)
   if prefer.bo(bufnr, "filetype") ~= "lua" then return jelly.warn("only support lua buffer right now") end
 
   local start_node = nuts.get_node_at_cursor(winid)

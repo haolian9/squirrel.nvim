@@ -3,15 +3,15 @@ local M = {}
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.saltedfish", "info")
 local listlib = require("infra.listlib")
+local ni = require("infra.ni")
 local prefer = require("infra.prefer")
 local strlib = require("infra.strlib")
 
 local nuts = require("squirrel.nuts")
 
 local ts = vim.treesitter
-local api = vim.api
 
-local ns = api.nvim_create_namespace("squirrel.saltedfish")
+local ns = ni.create_namespace("squirrel.saltedfish")
 
 ---@param node TSNode
 ---@return string
@@ -150,7 +150,7 @@ do
 end
 
 function M.lint(bufnr)
-  bufnr = bufnr or api.nvim_get_current_buf()
+  bufnr = bufnr or ni.get_current_buf()
 
   if prefer.bo(bufnr, "filetype") ~= "fish" then return jelly.warn("not a fish script") end
 
@@ -173,7 +173,7 @@ function M.lint(bufnr)
 end
 
 function M.attach(bufnr)
-  bufnr = bufnr or api.nvim_get_current_buf()
+  bufnr = bufnr or ni.get_current_buf()
 
   if prefer.bo(bufnr, "filetype") ~= "fish" then return jelly.warn("not a fish script") end
 

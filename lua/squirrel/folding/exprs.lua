@@ -1,4 +1,5 @@
-local api = vim.api
+local ni = require("infra.ni")
+
 local level_resolver = require("squirrel.folding.level_resolver")
 
 ---@class squirrel.folding.state
@@ -10,7 +11,7 @@ local state = {
   ---@param self squirrel.folding.state
   get = function(self, bufnr)
     if self.tick[bufnr] == nil then return end
-    local now = api.nvim_buf_get_changedtick(bufnr)
+    local now = ni.buf_get_changedtick(bufnr)
     if self.tick[bufnr] ~= now then
       self.tick[bufnr] = nil
       self.line_level[bufnr] = nil
@@ -33,11 +34,11 @@ local function expr_handler(ft)
   local resolver = level_resolver(ft)
   return function(lnum)
     lnum = lnum - 1
-    local bufnr = api.nvim_get_current_buf()
+    local bufnr = ni.get_current_buf()
     local line_level = state:get(bufnr)
     if line_level == nil then
       line_level = resolver(bufnr)
-      local tick = api.nvim_buf_get_changedtick(bufnr)
+      local tick = ni.buf_get_changedtick(bufnr)
       state:set(bufnr, tick, line_level)
     end
 
