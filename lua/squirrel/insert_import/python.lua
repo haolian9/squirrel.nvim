@@ -50,7 +50,7 @@ return function()
     startinsert = "a",
     bufcall = function(bufnr) wait_langclient_ready(bufnr, "python") end,
   }, function(line)
-    if line == nil then return end
+    if line == nil or line == "" then return end
     if strlib.startswith(line, "import ") then
       if #line <= #"import " then return end
     elseif strlib.startswith(line, "from ") then

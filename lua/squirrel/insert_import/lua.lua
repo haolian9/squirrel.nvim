@@ -82,7 +82,7 @@ return function()
     startinsert = "a",
     bufcall = function(bufnr) wait_langclient_ready(bufnr, "lua") end,
   }, function(line)
-    if line == nil then return end
+    if line == nil or line == "" then return end
     if #line <= #'require"' then return end
 
     local requires = resolve_require_stat(line)
