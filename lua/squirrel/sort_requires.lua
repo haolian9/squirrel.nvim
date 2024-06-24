@@ -194,7 +194,7 @@ return function(bufnr)
 
   local sorted_lines = {}
   do
-    for requires in itertools.filter(function(requires) return #requires > 0 end, tiers) do
+    for requires in itertools.filter(tiers, function(requires) return #requires > 0 end) do
       for _, el in ipairs(requires) do
         table.insert(sorted_lines, ts.get_node_text(el.node, bufnr))
       end
