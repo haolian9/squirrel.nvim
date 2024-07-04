@@ -6,7 +6,10 @@ local general = require("squirrel.fixends.general")
 
 function M.lua()
   local winid = ni.get_current_win()
-  return require("squirrel.fixends.lua")(winid) or general(winid)
+
+  return require("squirrel.fixends.postfix_op")(winid) --
+    or require("squirrel.fixends.lua")(winid)
+    or general(winid)
 end
 
 function M.general()
