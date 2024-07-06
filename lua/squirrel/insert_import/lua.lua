@@ -44,6 +44,7 @@ do
     ["infra.keymap.global"] = "m",
     ["infra._strfmt"] = "strfmt",
     ["string.buffer"] = "ropes",
+    ["beckon.select"] = "beckon_select",
   }
 
   ---@param path string
