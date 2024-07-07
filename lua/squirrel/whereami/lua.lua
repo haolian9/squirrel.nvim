@@ -1,12 +1,7 @@
-local Ephemeral = require("infra.Ephemeral")
 local itertools = require("infra.itertools")
-local jelly = require("infra.jellyfish")("squirrel.whereami")
 local ni = require("infra.ni")
-local prefer = require("infra.prefer")
-local rifts = require("infra.rifts")
 
 local nuts = require("squirrel.nuts")
-local facts = require("squirrel.whereami.facts")
 
 local collect_stops
 do
@@ -44,33 +39,15 @@ local function resolve_stop_name(bufnr, node)
 end
 
 ---@param winid integer
----@return string?
-local function resolve_route(winid)
+---@return string
+return function(winid)
   local bufnr = ni.win_get_buf(winid)
-
-  local ft = prefer.bo(bufnr, "filetype")
-  if ft ~= "lua" then return jelly.warn("not supported filetype: %s", ft) end
 
   local stops = { "" }
   for _, node in ipairs(collect_stops(nuts.get_node_at_cursor(winid))) do
     local stop = resolve_stop_name(bufnr, node)
     if stop ~= nil then table.insert(stops, stop) end
   end
+  if #stops == 1 then return "/" end
   return table.concat(stops, "/")
-end
-
-return function()
-  local route = resolve_route(ni.get_current_win())
-  if route == nil then return end
-
-  local bufnr = Ephemeral(nil, { route })
-
-  local winopts = { relative = "cursor", row = -1, col = 0, width = #route, height = 1 }
-  local winid = rifts.open.win(bufnr, false, winopts)
-  ni.win_set_hl_ns(winid, facts.floatwin_ns)
-
-  vim.defer_fn(function()
-    if not ni.win_is_valid(winid) then return end
-    ni.win_close(winid, false)
-  end, 1000 * 3)
 end
