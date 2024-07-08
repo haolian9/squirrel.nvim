@@ -91,7 +91,7 @@ end
 local sorted_tiers
 do
   local preset_tiers = {
-    itertools.toset({ "ffi" }),
+    itertools.toset({ "ffi", "string", "jit", "table" }),
     itertools.toset({ "vim" }),
     itertools.toset({ "infra", "cthulhu" }),
   }

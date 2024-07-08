@@ -45,6 +45,7 @@ do
     ["infra._strfmt"] = "strfmt",
     ["string.buffer"] = "ropes",
     ["beckon.select"] = "beckon_select",
+    ["table.new"] = "new_table",
   }
 
   ---@param path string
