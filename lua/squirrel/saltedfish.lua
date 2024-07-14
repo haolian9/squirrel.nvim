@@ -13,10 +13,6 @@ local ts = vim.treesitter
 
 local ns = ni.create_namespace("squirrel.saltedfish")
 
----@param node TSNode
----@return string
-local function get_node_text(bufnr, node) return ts.get_node_text(node, bufnr) end
-
 ---@param bufnr integer
 ---@param node TSNode
 ---@param msg string
@@ -70,7 +66,7 @@ do
     local iter = itertools.iter(set_node:field("argument"))
 
     for arg in iter do
-      local text = get_node_text(bufnr, arg)
+      local text = nuts.get_1l_node_text(bufnr, arg)
       if text == "--" then break end
       if not strlib.startswith(text, "-") then table.insert(args, arg) end
     end
@@ -87,7 +83,7 @@ do
     local ntype = arg_node:type()
     if ntype == "integer" or ntype == "float" then return end
 
-    local text = get_node_text(bufnr, arg_node)
+    local text = nuts.get_1l_node_text(bufnr, arg_node)
 
     if text == "=" or text == "!=" or text == "!" then return end
 
@@ -120,7 +116,7 @@ do
     local iter = itertools.iter(set_node:field("argument"))
 
     for arg in iter do
-      local text = get_node_text(bufnr, arg)
+      local text = nuts.get_1l_node_text(bufnr, arg)
       if text == "--" then error("unreachable") end
       if not strlib.startswith(text, "-") then return arg end
     end
@@ -136,7 +132,7 @@ do
     if arg0 == nil then return end
 
     -- should not be quoted nor $-prefixed
-    local text = get_node_text(bufnr, arg0)
+    local text = nuts.get_1l_node_text(bufnr, arg0)
 
     local c0 = string.sub(text, 1, 1)
     if c0 == "$" then return compose_dig(bufnr, arg0, "arg0 of set should not be $-prefixed") end

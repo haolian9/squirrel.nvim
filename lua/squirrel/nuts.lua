@@ -4,6 +4,7 @@
 
 local M = {}
 
+local buflines = require("infra.buflines")
 local ex = require("infra.ex")
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.nuts")
@@ -106,16 +107,25 @@ do
     return ni.buf_get_text(bufnr, start_line, start_col, stop_line, stop_col, {})
   end
 
+  ---ensure the given node is 1-line-range
+  ---returned string will never contain '\n'
+  ---@param bufnr integer
+  ---@param node TSNode
+  ---@return string?
+  function M.get_1l_node_text(bufnr, node)
+    local start_line, start_col, stop_line, stop_col = node:range()
+    assert(start_line == stop_line, "not 1-line-range node")
+    return buflines.partial_line(bufnr, start_line, start_col, stop_col)
+  end
+
   ---get the first char from the first line of a node
   ---@param bufnr integer
   ---@param node TSNode
   ---@return string
   function M.get_node_first_char(bufnr, node)
     local start_line, start_col = node:start()
-    local text = ni.buf_get_text(bufnr, start_line, start_col, start_line, start_col + 1, {})
-    assert(#text == 1)
-    local char = text[1]
-    assert(#char == 1)
+    local char = buflines.partial_line(bufnr, start_line, start_col, start_col + 1)
+    assert(char and #char == 1)
     return char
   end
 
@@ -125,10 +135,8 @@ do
   ---@return string
   function M.get_node_last_char(bufnr, node)
     local stop_line, stop_col = node:end_()
-    local text = ni.buf_get_text(bufnr, stop_line, stop_col - 1, stop_line, stop_col, {})
-    assert(#text == 1)
-    local char = text[1]
-    assert(#char == 1)
+    local char = buflines.partial_line(bufnr, stop_line, stop_col - 1, stop_col)
+    assert(char and #char == 1)
     return char
   end
 
@@ -145,9 +153,7 @@ do
     else
       corrected_stop_col = start_col + n
     end
-    local text = ni.buf_get_text(bufnr, start_line, start_col, start_line, corrected_stop_col, {})
-    assert(#text == 1)
-    return text[1]
+    return assert(buflines.partial_line(bufnr, start_line, start_col, corrected_stop_col))
   end
 
   ---get <=n chars from the last line of a node
@@ -163,9 +169,7 @@ do
     else
       corrected_start_col = math.max(stop_col - n, 0)
     end
-    local text = ni.buf_get_text(bufnr, stop_line, corrected_start_col, stop_line, stop_col, {})
-    assert(#text == 1)
-    return text[1]
+    return assert(buflines.partial_line(bufnr, stop_line, corrected_start_col, stop_col))
   end
 end
 

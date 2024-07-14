@@ -30,8 +30,6 @@ local strlib = require("infra.strlib")
 
 local nuts = require("squirrel.nuts")
 
-local ts = vim.treesitter
-
 ---@alias Require {name: string, node: TSNode}
 
 ---@param bufnr integer
@@ -63,7 +61,7 @@ local function find_require_mod_name(bufnr, root)
     if ident == nil then return jelly.err("too many nested function calls on the RHS") end
   end
 
-  if ts.get_node_text(ident, bufnr) ~= "require" then return end
+  if nuts.get_1l_node_text(bufnr, ident) ~= "require" then return end
 
   local arg0
   do
@@ -75,7 +73,7 @@ local function find_require_mod_name(bufnr, root)
 
   local name
   do
-    name = ts.get_node_text(arg0, bufnr)
+    name = nuts.get_1l_node_text(bufnr, arg0)
     if strlib.startswith(name, '"') or strlib.startswith(name, "'") then
       name = string.sub(name, 2, -2)
     elseif strlib.startswith(name, "[[") then
@@ -196,7 +194,7 @@ return function(bufnr)
   do
     for requires in itertools.filter(tiers, function(requires) return #requires > 0 end) do
       for _, el in ipairs(requires) do
-        table.insert(sorted_lines, ts.get_node_text(el.node, bufnr))
+        table.insert(sorted_lines, nuts.get_1l_node_text(bufnr, el.node))
       end
       table.insert(sorted_lines, "")
     end

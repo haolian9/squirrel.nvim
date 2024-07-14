@@ -14,8 +14,6 @@ local wincursor = require("infra.wincursor")
 
 local nuts = require("squirrel.nuts")
 
-local ts = vim.treesitter
-
 ---@param start TSNode
 ---@return TSNode?
 local function find_parent_field_decl_node(start)
@@ -42,7 +40,7 @@ local function try_field_ann(start, winid, bufnr)
     if decl_node == nil then return end
     local name_node = decl_node:named_child(0)
     assert(name_node:type() == "field_identifier")
-    field_name = ts.get_node_text(name_node, bufnr)
+    field_name = nuts.get_1l_node_text(bufnr, name_node)
   end
 
   local r0 = start:start()

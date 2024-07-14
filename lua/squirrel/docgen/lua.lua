@@ -13,8 +13,6 @@ local resolve_line_indents = require("infra.resolve_line_indents")
 local parrot = require("parrot")
 local nuts = require("squirrel.nuts")
 
-local ts = vim.treesitter
-
 local function find_fn_node_around_cursor(winid)
   local start = nuts.get_node_at_cursor(winid)
 
@@ -83,11 +81,11 @@ return function()
   do
     for i in itertools.range(params_node:named_child_count()) do
       local node = params_node:named_child(i)
-      local text = ts.get_node_text(node, bufnr)
+      local text = nuts.get_1l_node_text(bufnr, node)
       table.insert(anns, string.format("---@param %s $1", text))
     end
     local return_type = resolve_return_type(fn_node)
-    if return_type then table.insert(anns, string.format("---@return " .. return_type)) end
+    if return_type then table.insert(anns, string.format("---@return %s", return_type)) end
     if #anns == 0 then return jelly.info("no param nor return") end
     table.insert(anns, "")
   end
