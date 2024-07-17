@@ -21,11 +21,11 @@
 ---
 
 local buflines = require("infra.buflines")
+local BufTickRegulator = require("infra.BufTickRegulator")
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.sort_requires")
 local ni = require("infra.ni")
 local prefer = require("infra.prefer")
-local Regulator = require("infra.Regulator")
 local strlib = require("infra.strlib")
 
 local nuts = require("squirrel.nuts")
@@ -129,7 +129,7 @@ do
   end
 end
 
-local regulator = Regulator(1024)
+local regulator = BufTickRegulator(1024)
 
 return function(bufnr)
   if bufnr == nil or bufnr == 0 then bufnr = ni.get_current_buf() end

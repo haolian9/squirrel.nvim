@@ -111,11 +111,11 @@ do
   ---returned string will never contain '\n'
   ---@param bufnr integer
   ---@param node TSNode
-  ---@return string?
+  ---@return string
   function M.get_1l_node_text(bufnr, node)
     local start_line, start_col, stop_line, stop_col = node:range()
     assert(start_line == stop_line, "not 1-line-range node")
-    return buflines.partial_line(bufnr, start_line, start_col, stop_col)
+    return assert(buflines.partial_line(bufnr, start_line, start_col, stop_col))
   end
 
   ---get the first char from the first line of a node
