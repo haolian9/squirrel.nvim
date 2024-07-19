@@ -40,7 +40,7 @@ local function try_erred_block(winid, bufnr, start_node, err_node)
   local _ = start_node
 
   local start_chars = nuts.get_node_start_chars(bufnr, err_node, 5)
-  local start_line, _, stop_line, stop_col = err_node:range()
+  local start_line, _, stop_line, stop_col = nuts.get_node_range(err_node)
   local indents, ichar, iunit = resolve_line_indents(bufnr, start_line)
 
   local fixes, cursor

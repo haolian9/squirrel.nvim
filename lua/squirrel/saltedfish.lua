@@ -18,6 +18,7 @@ local ns = ni.create_namespace("squirrel.saltedfish")
 ---@param msg string
 ---@return table
 local function compose_dig(bufnr, node, msg)
+  assert(node:parent() ~= nil)
   local start_lnum, start_col, stop_lnum, stop_col = node:range()
 
   return {

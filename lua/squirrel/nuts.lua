@@ -14,6 +14,28 @@ local unsafe = require("infra.unsafe")
 local wincursor = require("infra.wincursor")
 local ts = vim.treesitter
 
+---the TSNode:range() could return illegal range, especially the root node
+---@param node TSNode
+---@return integer start_lnum @0-based, inclusive
+---@return integer start_col @0-based, inclusive
+---@return integer stop_lnum @0-based, inclusive
+---@return integer stop_col @0-based, exclusive; can be -1 which indicates EOL
+function M.get_node_range(node)
+  local start_lnum, start_col, stop_lnum, stop_col = node:range()
+
+  --stolen from vim.treesitter.get_node_text for edge cases
+  if stop_col == 0 then
+    if start_lnum == stop_lnum then
+      start_col = -1
+      start_lnum = start_lnum - 1
+    end
+    stop_col = -1
+    stop_lnum = stop_lnum - 1
+  end
+
+  return start_lnum, start_col, stop_lnum, stop_col
+end
+
 ---NB: when the cursor lays at the end of line, it will advance one char
 ---@param winid number
 ---@return TSNode
@@ -92,19 +114,8 @@ do
   ---@param node TSNode
   ---@return string[]
   function M.get_node_lines(bufnr, node)
-    local start_line, start_col, stop_line, stop_col = node:range()
-
-    --stolen from vim.treesitter.get_node_text for edge cases
-    if stop_col == 0 then
-      if start_line == stop_line then
-        start_col = -1
-        start_line = start_line - 1
-      end
-      stop_col = -1
-      stop_line = stop_line - 1
-    end
-
-    return ni.buf_get_text(bufnr, start_line, start_col, stop_line, stop_col, {})
+    local start_lnum, start_col, stop_lnum, stop_col = M.get_node_range(node)
+    return ni.buf_get_text(bufnr, start_lnum, start_col, stop_lnum, stop_col, {})
   end
 
   ---ensure the given node is 1-line-range
@@ -113,7 +124,7 @@ do
   ---@param node TSNode
   ---@return string
   function M.get_1l_node_text(bufnr, node)
-    local start_line, start_col, stop_line, stop_col = node:range()
+    local start_line, start_col, stop_line, stop_col = M.get_node_range(node)
     assert(start_line == stop_line, "not 1-line-range node")
     return assert(buflines.partial_line(bufnr, start_line, start_col, stop_col))
   end
@@ -134,8 +145,8 @@ do
   ---@param node TSNode
   ---@return string
   function M.get_node_last_char(bufnr, node)
-    local stop_line, stop_col = node:end_()
-    local char = buflines.partial_line(bufnr, stop_line, stop_col - 1, stop_col)
+    local _, _, stop_lnum, stop_col = M.get_node_range(node)
+    local char = buflines.partial_line(bufnr, stop_lnum, stop_col - 1, stop_col)
     assert(char and #char == 1)
     return char
   end
@@ -146,14 +157,18 @@ do
   ---@param n integer
   ---@return string
   function M.get_node_start_chars(bufnr, node, n)
-    local start_line, start_col, stop_line, stop_col = node:range()
+    local start_lnum, start_col, stop_lnum, stop_col = M.get_node_range(node)
     local corrected_stop_col
-    if start_line == stop_line then
-      corrected_stop_col = math.min(start_col + n, stop_col)
+    if start_lnum == stop_lnum then
+      if stop_col == -1 then
+        corrected_stop_col = start_col + n --this can lead to error()
+      else
+        corrected_stop_col = math.min(start_col + n, stop_col)
+      end
     else
       corrected_stop_col = start_col + n
     end
-    return assert(buflines.partial_line(bufnr, start_line, start_col, corrected_stop_col))
+    return assert(buflines.partial_line(bufnr, start_lnum, start_col, corrected_stop_col))
   end
 
   ---get <=n chars from the last line of a node
@@ -162,14 +177,18 @@ do
   ---@param n integer
   ---@return string
   function M.get_node_end_chars(bufnr, node, n)
-    local start_line, start_col, stop_line, stop_col = node:range()
+    local start_lnum, start_col, stop_lnum, stop_col = M.get_node_range(node)
     local corrected_start_col
-    if start_line == stop_line then
-      corrected_start_col = math.max(stop_col - n, start_col)
+    if start_lnum == stop_lnum then
+      if stop_col == -1 then
+        corrected_start_col = -n
+      else
+        corrected_start_col = math.max(stop_col - n, start_col)
+      end
     else
       corrected_start_col = math.max(stop_col - n, 0)
     end
-    return assert(buflines.partial_line(bufnr, stop_line, corrected_start_col, stop_col))
+    return assert(buflines.partial_line(bufnr, stop_lnum, corrected_start_col, stop_col))
   end
 end
 
