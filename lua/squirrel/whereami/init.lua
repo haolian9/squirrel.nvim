@@ -25,7 +25,7 @@ return function(filetype)
 
   local line = string.format("🌳%s🌳", route)
 
-  local bufnr = Ephemeral(nil, { line })
+  local bufnr = Ephemeral({ namepat = "squirrel://whereami/{bufnr}" }, { line })
 
   local winopts = { relative = "cursor", row = -1, col = 0, width = #line, height = 1 }
   local winid = rifts.open.win(bufnr, false, winopts)
