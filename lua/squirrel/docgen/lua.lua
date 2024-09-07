@@ -94,6 +94,6 @@ return function()
     local lnum = fn_node:start()
     local indents = resolve_line_indents(bufnr, lnum)
     local col = #indents
-    parrot.expand_external_chirp(anns, winid, { lnum = lnum, col = col, col_end = col })
+    parrot.external_expand(anns, winid, { lnum = lnum, col = col, col_end = col })
   end
 end
