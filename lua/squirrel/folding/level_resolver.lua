@@ -82,6 +82,7 @@ do
 
   tree_walkers.go = tree_walkers.zig
   tree_walkers.json = tree_walkers.zig
+  tree_walkers.glsl = tree_walkers.c
 end
 
 ---@type squirrel.folding.TipWalkers
@@ -112,6 +113,7 @@ do
   tip_walkers.go = tip_walkers.zig
   tip_walkers.c = tip_walkers.zig
   tip_walkers.json = tip_walkers.zig
+  tip_walkers.glsl = tip_walkers.c
 end
 
 --:h fold-expr
