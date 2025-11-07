@@ -2,8 +2,6 @@ local M = {}
 
 local prefer = require("infra.prefer")
 
-local api = vim.api
-
 ---@param winid integer
 ---@param ft string
 function M.attach(winid, ft)
