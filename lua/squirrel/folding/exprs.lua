@@ -66,7 +66,8 @@ end
 ---@type { [string]: squirrel.folding.fold_expr }
 return setmetatable({}, {
   __index = function(t, key)
-    t[key] = expr_handler(key)
-    return t[key]
+    local v = expr_handler(key)
+    rawset(t, key, v)
+    return v
   end,
 })
