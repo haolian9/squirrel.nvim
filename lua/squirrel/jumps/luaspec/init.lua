@@ -3,6 +3,7 @@ local M = {}
 local ex = require("infra.ex")
 local feedkeys = require("infra.feedkeys")
 local jelly = require("infra.jellyfish")("squirrel.jumps.luaspec")
+local mi = require("infra.mi")
 local ni = require("infra.ni")
 
 local nodeops = require("squirrel.jumps.luaspec.nodeops")
@@ -33,7 +34,7 @@ do
   local function vsel_object(finder, vseler)
     ---@param winid number?
     return function(winid)
-      winid = winid or ni.get_current_win()
+      winid = mi.resolve_winid_param(winid)
       local target = finder(nuts.get_node_at_cursor(winid))
       if target == nil then
         jelly.info("no object available")
@@ -70,7 +71,7 @@ do
   ---@return fun(winid: number?)
   local function goto_object(finder, go_to)
     return function(winid)
-      winid = winid or ni.get_current_win()
+      winid = mi.resolve_winid_param(winid)
       for _ = 1, vim.v.count1 do
         local target = finder(nuts.get_node_at_cursor(winid))
         if target == nil then return jelly.info("no objects available") end
@@ -94,7 +95,7 @@ do
 end
 
 function M.goto_peer(winid)
-  winid = winid or ni.get_current_win()
+  winid = mi.resolve_winid_param(winid)
   if not peerouter(winid) then
     -- fallback to native %
     ex.eval("normal! %")

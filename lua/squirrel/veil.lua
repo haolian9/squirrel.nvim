@@ -2,7 +2,7 @@ local M = {}
 
 local buflines = require("infra.buflines")
 local jelly = require("infra.jellyfish")("squirrel.veil", "info")
-local ni = require("infra.ni")
+local mi = require("infra.mi")
 local prefer = require("infra.prefer")
 local resolve_line_indents = require("infra.resolve_line_indents")
 local vsel = require("infra.vsel")
@@ -16,8 +16,10 @@ local blk_pairs = {
   sh = { "{", "}" },
 }
 
+---@param ft string
+---@param bufnr? integer
 function M.cover(ft, bufnr)
-  bufnr = bufnr or ni.get_current_buf()
+  bufnr = mi.resolve_bufnr_param(bufnr)
   ft = ft or prefer.bo(bufnr, "filetype")
 
   local pair = blk_pairs[ft]

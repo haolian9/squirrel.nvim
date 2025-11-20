@@ -3,6 +3,7 @@ local M = {}
 local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.saltedfish", "info")
 local listlib = require("infra.listlib")
+local mi = require("infra.mi")
 local ni = require("infra.ni")
 local prefer = require("infra.prefer")
 local strlib = require("infra.strlib")
@@ -146,8 +147,9 @@ do
   function rule_set_var_with_dollar(bufnr, set_node) return { lint(bufnr, set_node) } end
 end
 
+---@param bufnr? integer
 function M.lint(bufnr)
-  bufnr = bufnr or ni.get_current_buf()
+  bufnr = mi.resolve_bufnr_param(bufnr)
 
   if prefer.bo(bufnr, "filetype") ~= "fish" then return jelly.warn("not a fish script") end
 
@@ -169,8 +171,9 @@ function M.lint(bufnr)
   vim.diagnostic.set(ns, bufnr, digs)
 end
 
+---@param bufnr? integer
 function M.attach(bufnr)
-  bufnr = bufnr or ni.get_current_buf()
+  bufnr = mi.resolve_bufnr_param(bufnr)
 
   if prefer.bo(bufnr, "filetype") ~= "fish" then return jelly.warn("not a fish script") end
 

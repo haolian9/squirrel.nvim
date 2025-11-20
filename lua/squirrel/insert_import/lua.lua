@@ -46,6 +46,8 @@ do
     ["string.buffer"] = "ropes",
     ["beckon.select"] = "beckon_select",
     ["table.new"] = "new_table",
+    ["vim.lsp.util"] = "lsputil",
+    ["vim.lsp.protocol"] = "lspro",
   }
 
   ---@param path string
