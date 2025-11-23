@@ -1,10 +1,11 @@
 some applications of nvim's treesitter API
 
-## status: too many todos, far from complete
+## status
+* just works
 
 ## prerequisites
 * linux
-* nvim 0.9.*
+* nvim 0.11.*
 * haolian9/infra.nvim
 
 ## features & usage
@@ -22,3 +23,6 @@ some applications of nvim's treesitter API
     * `:lua require'squirrel.incsel'.m()` # lua only
 * wrapping codes into block scope (lua, python, zig, c, go, sh)
     * select text then `:lua require'squirrel.veil'.cover('lua')`
+* adding a few end pairs, imperfectly
+* toggle python fstr
+* sorting lua require statements
