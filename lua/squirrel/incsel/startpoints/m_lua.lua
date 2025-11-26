@@ -1,4 +1,4 @@
-local itertools = require("infra.itertools")
+local setlib = require("infra.setlib")
 
 local nuts = require("squirrel.nuts")
 
@@ -6,7 +6,7 @@ local nuts = require("squirrel.nuts")
 
 local passthrough
 do
-  local types = itertools.toset({ "comment" })
+  local types = setlib.new("comment")
   local function inner(node) return node end
 
   ---@param ntype string
@@ -17,7 +17,7 @@ do
 end
 
 local seek_upward = (function()
-  local stops = itertools.toset({
+  local stops = setlib.new(
     "function_call",
     "table_constructor",
     "block",
@@ -41,8 +41,8 @@ local seek_upward = (function()
     "expression_list",
     --
     "for_generic_clause",
-    "for_numeric_clause",
-  })
+    "for_numeric_clause"
+  )
 
   ---@type {[string]: fun(parent: TSNode): boolean}
   local conditional_stops = {

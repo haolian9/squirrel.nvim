@@ -26,6 +26,7 @@ local itertools = require("infra.itertools")
 local jelly = require("infra.jellyfish")("squirrel.sort_requires")
 local ni = require("infra.ni")
 local prefer = require("infra.prefer")
+local setlib = require("infra.setlib")
 local strlib = require("infra.strlib")
 
 local nuts = require("squirrel.nuts")
@@ -89,9 +90,9 @@ end
 local sorted_tiers
 do
   local preset_tiers = {
-    itertools.toset({ "ffi", "string", "jit", "table" }),
-    itertools.toset({ "vim" }),
-    itertools.toset({ "infra", "cthulhu" }),
+    setlib.new("ffi", "string", "jit", "table"),
+    setlib.new("vim"),
+    setlib.new("infra", "cthulhu"),
   }
 
   ---@param a Require

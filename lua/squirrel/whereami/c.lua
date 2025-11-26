@@ -1,5 +1,5 @@
-local itertools = require("infra.itertools")
 local ni = require("infra.ni")
+local setlib = require("infra.setlib")
 
 local nuts = require("squirrel.nuts")
 
@@ -7,7 +7,7 @@ local nuts = require("squirrel.nuts")
 
 local collect_stops
 do
-  local types = itertools.toset({ "function_definition", "declaration" })
+  local types = setlib.new("function_definition", "declaration")
 
   ---@param start_node TSNode
   ---@return TSNode[]
