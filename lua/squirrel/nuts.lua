@@ -13,6 +13,8 @@ local ni = require("infra.ni")
 local infra_nuts = require("infra.nuts")
 local wincursor = require("infra.wincursor")
 
+local ts = vim.treesitter
+
 M.get_node_range = infra_nuts.node_range
 M.get_node_at_cursor = infra_nuts.node_at_cursor
 M.same_range = infra_nuts.same_range
@@ -146,6 +148,16 @@ function M.get_named_decendant(root, ...)
     if next:type() ~= itype then return jelly.debug("n=%d type.expect=%s .actual=%s", i, itype, next:type()) end
   end
   return next
+end
+
+---@param callback fun(trees)
+function M.on_trees_ready(bufnr, callback)
+  local langtree = ts.get_parser(bufnr, nil)
+  if langtree == nil then return jelly.warn("no available treesit parser for buf=%s", bufnr) end
+  langtree:parse(false, function(err, trees)
+    assert(err == nil, err)
+    callback(trees)
+  end)
 end
 
 return M

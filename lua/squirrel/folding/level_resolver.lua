@@ -118,14 +118,15 @@ end
 
 --:h fold-expr
 ---@param ft string
----@return fun(bufnr: number): squirrel.folding.LineLevel
+---@return fun(bufnr: number): squirrel.folding.LineLevel?
 return function(ft)
   local walk_tip = assert(tip_walkers[ft], "unsupported tip_walker for ft=")
   local walk_tree = assert(tree_walkers[ft], "unsupported tree_walker for ft=")
 
   return function(bufnr)
     ---@type TSNode
-    local root = assert(nuts.get_root_node(bufnr))
+    local root = nuts.get_root_node(bufnr)
+    if root == nil then return end
 
     ---@type squirrel.folding.LineLevel
     local line_level = {}
