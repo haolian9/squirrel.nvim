@@ -1,10 +1,10 @@
 local buflines = require("infra.buflines")
 local jelly = require("infra.jellyfish")("squirrel.import_import.go")
 local ni = require("infra.ni")
+local prefer = require("infra.prefer")
 
 local puff = require("puff")
 local facts = require("squirrel.insert_import.facts")
-local wait_langclient_ready = require("squirrel.insert_import.wait_langclient_ready")
 local nuts = require("squirrel.nuts")
 
 local find_anchor
@@ -48,7 +48,7 @@ return function()
     default = 'import ""',
     icon = "🚀",
     startinsert = "i",
-    bufcall = function(bufnr) wait_langclient_ready(bufnr, "go") end,
+    bufcall = function(bufnr) prefer.bo(bufnr, "filetype", "go") end,
   }, function(line)
     if line == nil or line == "" then return end
     if #line <= #'import""' then return end
