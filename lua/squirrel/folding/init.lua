@@ -1,14 +1,11 @@
 local M = {}
 
-local ctx = require("infra.ctx")
-local ex = require("infra.ex")
 local jelly = require("infra.jellyfish")("squirrel.folding", "info")
 local logging = require("infra.logging")
 local ni = require("infra.ni")
 local prefer = require("infra.prefer")
 
-local level_resolver = require("squirrel.folding.level_resolver")
-local nuts = require("squirrel.nuts")
+local Resolver = require("squirrel.folding.Resolver")
 
 local log = logging.newlogger("squirrel.folding", "info")
 
@@ -41,9 +38,8 @@ local state = {
 
 ---@return squirrel.folding.fold_expr
 local function expr_handler(ft)
-  local resolver = level_resolver(ft)
+  local resolver = Resolver(ft)
   return function(lnum)
-    lnum = lnum - 1
     local bufnr = ni.get_current_buf()
     local line_level = state:get(bufnr)
     if line_level == nil then
@@ -82,14 +78,6 @@ local exprs = setmetatable({}, {
     return handle
   end,
 })
-
-function M.attach(bufnr) --
-  nuts.on_trees_ready(bufnr, function() -- treesitter async parsing
-    ctx.buf(bufnr, function() --
-      ex("setlocal", "nofoldenable", "foldmethod=expr", [[foldexpr=v:lua.require'squirrel.folding'.expr()]])
-    end)
-  end)
-end
 
 function M.expr(row)
   local lnum = (row or vim.v.lnum) - 1
