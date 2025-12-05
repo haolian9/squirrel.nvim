@@ -9,19 +9,18 @@ local nuts = require("squirrel.nuts")
 function M.tip_walker(tree_walker, line_level, tip)
   local start_lnum, _, stop_lnum = nuts.get_node_range(tip)
 
-  local lv = 0
-
   if tip:type() == "comment" then
     for lnum = start_lnum, stop_lnum do
       if line_level[lnum] ~= nil then
         --inline comment
       else
-        line_level[lnum] = lv + 1
+        line_level[lnum] = 2
       end
     end
     return
   end
 
+  local lv = 1
   line_level[start_lnum] = lv
   line_level[stop_lnum] = lv
   if start_lnum == stop_lnum then return end
