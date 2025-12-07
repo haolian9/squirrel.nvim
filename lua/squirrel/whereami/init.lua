@@ -9,20 +9,11 @@ local facts = require("squirrel.whereami.facts")
 
 return function(filetype)
   local host_winid = ni.get_current_win()
-  if filetype == nil then
-    local host_bufnr = ni.win_get_buf(host_winid)
-    filetype = prefer.bo(host_bufnr, "filetype")
+  if filetype == nil then --
+    filetype = prefer.bo(ni.win_get_buf(host_winid), "filetype")
   end
 
-  local route
-  if filetype == "c" then
-    route = require("squirrel.whereami.c")(host_winid)
-  elseif filetype == "lua" then
-    route = require("squirrel.whereami.lua")(host_winid)
-  else
-    error("unsupported filetype")
-  end
-
+  local route = assert(require("squirrel.whereami." .. filetype))(host_winid)
   local line = string.format("🌳%s🌳", route)
 
   local bufnr = Ephemeral({ namepat = "squirrel://whereami/{bufnr}" }, { line })
@@ -34,5 +25,5 @@ return function(filetype)
   vim.defer_fn(function()
     if not ni.win_is_valid(winid) then return end
     ni.win_close(winid, false)
-  end, 1000 * 2)
+  end, 1000 * 3)
 end

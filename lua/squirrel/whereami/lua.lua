@@ -27,15 +27,18 @@ end
 ---@param node TSNode
 ---@return string?
 local function resolve_stop_name(bufnr, node)
-  local fields = node:field("name")
-  if #fields == 0 then return "()" end
-  if #fields == 1 then
-    local name = fields[1]
-    local ntype = name:type()
-    assert(ntype == "identifier" or ntype == "method_index_expression" or ntype == "dot_index_expression", ntype)
-    return nuts.get_node_lines(bufnr, name)[1]
+  local ntype = node:type()
+
+  if ntype == "function_definition" then return "()" end
+
+  if ntype == "function_declaration" then
+    local name = assert(node:named_child(0))
+    local t = name:type()
+    assert(t == "identifier" or t == "method_index_expression" or t == "dot_index_expression", t)
+    return nuts.get_1l_node_text(bufnr, name)
   end
-  error("unreachable: multiple name field")
+
+  error("unreachable")
 end
 
 ---@param winid integer
@@ -48,6 +51,5 @@ return function(winid)
     local stop = resolve_stop_name(bufnr, node)
     if stop ~= nil then table.insert(stops, stop) end
   end
-  if #stops == 1 then return "/" end
   return table.concat(stops, "/")
 end
