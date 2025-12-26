@@ -2,7 +2,6 @@ local M = {}
 
 local jelly = require("infra.jellyfish")("squirrel.jumps.zigspec")
 local mi = require("infra.mi")
-local ni = require("infra.ni")
 
 local nodeops = require("squirrel.jumps.zigspec.nodeops")
 local treewalker = require("squirrel.jumps.zigspec.treewalker")

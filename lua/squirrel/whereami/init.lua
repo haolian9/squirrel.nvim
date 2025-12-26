@@ -1,19 +1,23 @@
 local Ephemeral = require("infra.Ephemeral")
-local itertools = require("infra.itertools")
 local ni = require("infra.ni")
+local oop = require("infra.oop")
 local prefer = require("infra.prefer")
 local rifts = require("infra.rifts")
 
-local nuts = require("squirrel.nuts")
 local facts = require("squirrel.whereami.facts")
 
-return function(filetype)
+local routers = oop.lazyattrs({}, function(ft)
+  local modname = "squirrel.whereami." .. ft
+  return require(modname)
+end)
+
+return function(ft)
   local host_winid = ni.get_current_win()
-  if filetype == nil then --
-    filetype = prefer.bo(ni.win_get_buf(host_winid), "filetype")
+  if ft == nil then --
+    ft = prefer.bo(ni.win_get_buf(host_winid), "filetype")
   end
 
-  local route = assert(require("squirrel.whereami." .. filetype))(host_winid)
+  local route = assert(routers[ft])(host_winid)
   local line = string.format("🌳%s🌳", route)
 
   local bufnr = Ephemeral({ namepat = "squirrel://whereami/{bufnr}" }, { line })

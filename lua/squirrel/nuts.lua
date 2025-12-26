@@ -150,7 +150,7 @@ function M.get_named_decendant(root, ...)
   return next
 end
 
----@param callback fun(trees)
+---@param callback fun(trees:table<integer,TSTree>)
 function M.on_trees_ready(bufnr, callback)
   local langtree = ts.get_parser(bufnr, nil)
   if langtree == nil then return jelly.warn("no available treesit parser for buf=%s", bufnr) end

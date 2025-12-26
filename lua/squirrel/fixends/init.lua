@@ -1,23 +1,27 @@
 local M = {}
 
 local ni = require("infra.ni")
+local oop = require("infra.oop")
 
-local general = require("squirrel.fixends.general")
-local postfix_op = require("squirrel.fixends.postfix_op")
+---@type table<string,fun(winid:integer):true?>
+local solutions = oop.lazyattrs({}, function(key)
+  local modname = string.format("squirrel.fixends.%s", key)
+  return require(modname)
+end)
 
 function M.lua()
   local winid = ni.get_current_win()
 
-  return postfix_op(winid) --
-    or require("squirrel.fixends.lua")(winid) --
-    or general(winid)
+  return solutions.postfix_op(winid) --
+    or solutions.lua(winid) --
+    or solutions.general(winid)
 end
 
 function M.general()
   local winid = ni.get_current_win()
 
-  return postfix_op(winid) --
-    or general(winid)
+  return solutions.postfix_op(winid) --
+    or solutions.general(winid)
 end
 
 return M
